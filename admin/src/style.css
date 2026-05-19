@@ -1,0 +1,156 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: #fff0f3;
+  color: #333;
+}
+
+a {
+  color: #ff6b9d;
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 14px;
+}
+
+button.primary {
+  background: #ff6b9d;
+  color: #fff;
+}
+
+button.ghost {
+  background: #ffe4ec;
+  color: #ff6b9d;
+}
+
+button.danger {
+  background: #ff4d6d;
+  color: #fff;
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 16px rgba(255, 107, 157, 0.12);
+}
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 220px;
+  background: #fff;
+  padding: 24px 16px;
+  border-right: 1px solid #ffe4ec;
+}
+
+.sidebar h1 {
+  font-size: 18px;
+  color: #ff6b9d;
+  margin: 0 0 24px;
+}
+
+.sidebar nav a {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  color: #666;
+}
+
+.sidebar nav a.router-link-active {
+  background: #ffe4ec;
+  color: #ff6b9d;
+  font-weight: 600;
+}
+
+.main {
+  flex: 1;
+  padding: 24px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-item {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+
+.stat-item strong {
+  display: block;
+  font-size: 28px;
+  color: #ff6b9d;
+  margin-bottom: 6px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+th,
+td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ffe4ec;
+  font-size: 14px;
+}
+
+th {
+  background: #fff5f8;
+  color: #999;
+  font-weight: 500;
+}
+
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-card {
+  width: 360px;
+}
+
+.login-card input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0 16px;
+  border: 1px solid #ffe4ec;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.error {
+  color: #ff4d6d;
+  font-size: 13px;
+  margin-top: 8px;
+}

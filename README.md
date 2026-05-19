@@ -436,6 +436,8 @@ Purple Soft       #F0E4FF
 
 ```text
 voice-confession-wall/
+├─ admin/                 # 管理后台（内容审核、举报处理）
+├─ docs/                  # 项目文档（API、搭建、数据库）
 ├─ client/
 │  ├─ api/                  # 前端 API 封装
 │  │  ├─ auth.js

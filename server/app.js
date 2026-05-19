@@ -14,8 +14,13 @@ app.use(helmet({
 }));
 
 // CORS configuration
+const allowedOrigins = [
+  process.env.CLIENT_ORIGIN,
+  process.env.ADMIN_ORIGIN
+].filter(Boolean);
+
 app.use(cors({
-  origin: process.env.CLIENT_ORIGIN || '*',
+  origin: allowedOrigins.length > 0 ? allowedOrigins : '*',
   credentials: true
 }));
 
@@ -74,6 +79,7 @@ app.use('/api/comment', require('./routes/comment'));
 app.use('/api/upload', uploadLimiter, require('./routes/upload'));
 app.use('/api/ranking', require('./routes/ranking'));
 app.use('/api/report', reportLimiter, require('./routes/report'));
+app.use('/api/admin', require('./routes/admin'));
 
 // Health check
 app.get('/api/health', (req, res) => {
