@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <title>语音表白墙 - 预览</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f5f5f5;
+      min-height: 100vh;
+    }
+
+    /* 手机模拟器框架 */
+    .mobile-preview {
+      max-width: 414px;
+      margin: 0 auto;
+      background: #fff;
+      min-height: 100vh;
+      box-shadow: 0 0 30px rgba(0,0,0,0.1);
+    }
+
+    @media (min-width: 768px) {
+      body {
+        padding: 20px;
+      }
+
+      .mobile-preview {
+        min-height: 812px;
+        border-radius: 40px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .mobile-preview::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 150px;
+        height: 30px;
+        background: #000;
+        border-radius: 0 0 20px 20px;
+        z-index: 100;
+      }
+    }
+
+    /* Tab Bar */
+    .tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 414px;
+      height: 60px;
+      background: #fff;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      border-top: 1px solid #f0f0f0;
+      padding-bottom: env(safe-area-inset-bottom);
+      z-index: 100;
+    }
+
+    .tab-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .tab-item.active {
+      color: #FF6B9D;
+    }
+
+    .tab-icon {
+      font-size: 24px;
+      margin-bottom: 2px;
+    }
+
+    .tab-text {
+      font-size: 12px;
+    }
+
+    /* 页面内容 */
+    .page-content {
+      padding-bottom: 80px;
+      min-height: 100vh;
+    }
+
+    /* 顶部导航 */
+    .nav-bar {
+      background: #fff;
+      padding: 15px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 18px;
+      border-bottom: 1px solid #f0f0f0;
+      padding-top: calc(15px + env(safe-area-inset-top));
+    }
+
+    /* 分类栏 */
+    .category-bar {
+      display: flex;
+      overflow-x: auto;
+      background: #fff;
+      padding: 15px;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .category-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .category-item {
+      display: inline-flex;
+      padding: 8px 20px;
+      margin-right: 10px;
+      border-radius: 20px;
+      font-size: 14px;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .category-item.active {
+      background: linear-gradient(135deg, #ff6b9d 0%, #ff8fb3 100%);
+      color: #fff;
+      font-weight: bold;
+    }
+
+    /* 表白卡片 */
+    .confession-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      margin: 15px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .user-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .nickname {
+      font-size: 16px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .anonymous-id {
+      font-size: 12px;
+      color: #999;
+    }
+
+    .category-tag {
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      background: #FFE4EC;
+      color: #ff6b9d;
+    }
+
+    .card-title {
+      font-size: 15px;
+      color: #333;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    /* 音频播放器 */
+    .audio-section {
+      display: flex;
+      align-items: center;
+      background: #f8f8f8;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 12px;
+    }
+
+    .play-btn {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #ff6b9d 0%, #ff8fb3 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+      cursor: pointer;
+      color: #fff;
+      font-size: 20px;
+    }
+
+    .play-btn.playing {
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(0.95); opacity: 0.8; }
+    }
+
+    .audio-info {
+      flex: 1;
+    }
+
+    .duration {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    .waveform {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      height: 30px;
+    }
+
+    .wave-bar {
+      width: 3px;
+      background: #ff6b9d;
+      border-radius: 2px;
+      animation: wave 1s ease-in-out infinite;
+    }
+
+    @keyframes wave {
+      0%, 100% { height: 10px; }
+      50% { height: 25px; }
+    }
+
+    /* 卡片底部 */
+    .card-footer {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 14px;
+      color: #999;
+      cursor: pointer;
+    }
+
+    .stat-item.liked {
+      color: #ff6b9d;
+    }
+
+    .card-time {
+      flex: 1;
+      text-align: right;
+      font-size: 12px;
+      color: #bbb;
+    }
+
+    /* 空状态 */
+    .empty-state {
+      text-align: center;
+      padding: 80px 40px;
+    }
+
+    .empty-icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+    }
+
+    .empty-text {
+      font-size: 16px;
+      color: #999;
+      margin-bottom: 8px;
+    }
+
+    .empty-tip {
+      font-size: 14px;
+      color: #bbb;
+    }
+
+    /* 发布按钮 */
+    .fab-button {
+      position: fixed;
+      right: 20px;
+      bottom: 100px;
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #ff6b9d 0%, #ff8fb3 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 28px;
+      box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);
+      cursor: pointer;
+      z-index: 99;
+    }
+
+    /* 启动页 */
+    .splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, #fff5f7 0%, #ffeef2 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      transition: opacity 0.5s;
+    }
+
+    .splash-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .splash-logo {
+      width: 120px;
+      height: 120px;
+      background: linear-gradient(135deg, #ff6b9d 0%, #ff8fb3 100%);
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 60px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 40px rgba(255, 107, 157, 0.3);
+    }
+
+    .splash-title {
+      font-size: 28px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .splash-subtitle {
+      font-size: 16px;
+      color: #999;
+    }
+
+    /* 提示信息 */
+    .preview-notice {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.7);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 14px;
+      z-index: 1001;
+      display: none;
+    }
+
+    @media (min-width: 768px) {
+      .preview-notice {
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 提示信息 -->
+  <div class="preview-notice">
+    💡 这是静态预览，完整功能请运行开发服务器
+  </div>
+
+  <!-- 启动页 -->
+  <div class="splash-screen" id="splash">
+    <div class="splash-logo">💕</div>
+    <div class="splash-title">语音表白墙</div>
+    <div class="splash-subtitle">在这里，听见你的心跳</div>
+  </div>
+
+  <!-- 手机预览框架 -->
+  <div class="mobile-preview">
+    <!-- 页面内容 -->
+    <div class="page-content" id="pageContent">
+      <!-- 首页内容 -->
+      <div class="page" id="page-home">
+        <div class="nav-bar">语音表白墙</div>
+
+        <!-- 分类栏 -->
+        <div class="category-bar">
+          <div class="category-item active">全部</div>
+          <div class="category-item">暗恋</div>
+          <div class="category-item">失恋</div>
+          <div class="category-item">感谢</div>
+          <div class="category-item">道歉</div>
+        </div>
+
+        <!-- 表白列表 -->
+        <div class="confession-list">
+          <div class="confession-card">
+            <div class="card-header">
+              <div class="user-info">
+                <div class="nickname">温柔的猫咪</div>
+                <div class="anonymous-id">用户#08923</div>
+              </div>
+              <div class="category-tag">暗恋</div>
+            </div>
+            <div class="card-title">喜欢你三年了，一直不敢说出口...</div>
+            <div class="audio-section" onclick="togglePlay(this)">
+              <div class="play-btn">▶</div>
+              <div class="audio-info">
+                <div class="duration">00:42</div>
+                <div class="waveform">
+                  <div class="wave-bar" style="height: 15px; animation-delay: 0s;"></div>
+                  <div class="wave-bar" style="height: 20px; animation-delay: 0.1s;"></div>
+                  <div class="wave-bar" style="height: 12px; animation-delay: 0.2s;"></div>
+                  <div class="wave-bar" style="height: 25px; animation-delay: 0.3s;"></div>
+                  <div class="wave-bar" style="height: 18px; animation-delay: 0.4s;"></div>
+                  <div class="wave-bar" style="height: 22px; animation-delay: 0.5s;"></div>
+                  <div class="wave-bar" style="height: 15px; animation-delay: 0.6s;"></div>
+                  <div class="wave-bar" style="height: 20px; animation-delay: 0.7s;"></div>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <div class="stat-item">
+                <span>❤️</span>
+                <span>128</span>
+              </div>
+              <div class="stat-item">
+                <span>💬</span>
+                <span>32</span>
+              </div>
+              <div class="stat-item">
+                <span>▶</span>
+                <span>568</span>
+              </div>
+              <div class="card-time">10分钟前</div>
+            </div>
+          </div>
+
+          <div class="confession-card">
+            <div class="card-header">
+              <div class="user-info">
+                <div class="nickname">孤独的星星</div>
+                <div class="anonymous-id">用户#12456</div>
+              </div>
+              <div class="category-tag" style="background: #E8E4FF; color: #8B7FD9;">失恋</div>
+            </div>
+            <div class="audio-section" onclick="togglePlay(this)">
+              <div class="play-btn">▶</div>
+              <div class="audio-info">
+                <div class="duration">01:15</div>
+                <div class="waveform">
+                  <div class="wave-bar" style="height: 12px; animation-delay: 0.1s;"></div>
+                  <div class="wave-bar" style="height: 18px; animation-delay: 0.2s;"></div>
+                  <div class="wave-bar" style="height: 22px; animation-delay: 0.3s;"></div>
+                  <div class="wave-bar" style="height: 15px; animation-delay: 0.4s;"></div>
+                  <div class="wave-bar" style="height: 25px; animation-delay: 0.5s;"></div>
+                  <div class="wave-bar" style="height: 20px; animation-delay: 0.6s;"></div>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <div class="stat-item liked">
+                <span>❤️</span>
+                <span>256</span>
+              </div>
+              <div class="stat-item">
+                <span>💬</span>
+                <span>89</span>
+              </div>
+              <div class="stat-item">
+                <span>▶</span>
+                <span>1.2k</span>
+              </div>
+              <div class="card-time">30分钟前</div>
+            </div>
+          </div>
+
+          <div class="confession-card">
+            <div class="card-header">
+              <div class="user-info">
+                <div class="nickname">感恩的心</div>
+                <div class="anonymous-id">用户#07832</div>
+              </div>
+              <div class="category-tag" style="background: #E4F5FF; color: #5BA3D9;">感谢</div>
+            </div>
+            <div class="card-title">谢谢你出现在我的生命里...</div>
+            <div class="audio-section" onclick="togglePlay(this)">
+              <div class="play-btn">▶</div>
+              <div class="audio-info">
+                <div class="duration">00:58</div>
+                <div class="waveform">
+                  <div class="wave-bar" style="height: 18px; animation-delay: 0s;"></div>
+                  <div class="wave-bar" style="height: 15px; animation-delay: 0.1s;"></div>
+                  <div class="wave-bar" style="height: 22px; animation-delay: 0.2s;"></div>
+                  <div class="wave-bar" style="height: 20px; animation-delay: 0.3s;"></div>
+                  <div class="wave-bar" style="height: 16px; animation-delay: 0.4s;"></div>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <div class="stat-item">
+                <span>❤️</span>
+                <span>89</span>
+              </div>
+              <div class="stat-item">
+                <span>💬</span>
+                <span>15</span>
+              </div>
+              <div class="stat-item">
+                <span>▶</span>
+                <span>423</span>
+              </div>
+              <div class="card-time">1小时前</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab Bar -->
+    <div class="tab-bar">
+      <div class="tab-item active" onclick="switchTab(this, 'home')">
+        <div class="tab-icon">🏠</div>
+        <div class="tab-text">首页</div>
+      </div>
+      <div class="tab-item" onclick="switchTab(this, 'category')">
+        <div class="tab-icon">📂</div>
+        <div class="tab-text">分类</div>
+      </div>
+      <div class="tab-item" onclick="switchTab(this, 'post')">
+        <div class="tab-icon" style="font-size: 32px; margin-top: -10px;">➕</div>
+        <div class="tab-text">发布</div>
+      </div>
+      <div class="tab-item" onclick="switchTab(this, 'rank')">
+        <div class="tab-icon">🏆</div>
+        <div class="tab-text">榜单</div>
+      </div>
+      <div class="tab-item" onclick="switchTab(this, 'profile')">
+        <div class="tab-icon">👤</div>
+        <div class="tab-text">我的</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 隐藏启动页
+    setTimeout(() => {
+      document.getElementById('splash').classList.add('hidden');
+    }, 2000);
+
+    // 切换Tab
+    function switchTab(element, tab) {
+      document.querySelectorAll('.tab-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      element.classList.add('active');
+
+      // 模拟页面切换提示
+      if (tab !== 'home') {
+        showToast('该页面在完整版中可用');
+      }
+    }
+
+    // 播放/暂停切换
+    function togglePlay(element) {
+      const playBtn = element.querySelector('.play-btn');
+      const isPlaying = playBtn.classList.contains('playing');
+
+      // 停止所有其他播放
+      document.querySelectorAll('.play-btn').forEach(btn => {
+        btn.classList.remove('playing');
+        btn.textContent = '▶';
+      });
+
+      if (!isPlaying) {
+        playBtn.classList.add('playing');
+        playBtn.textContent = '⏸';
+      }
+    }
+
+    // 显示提示
+    function showToast(message) {
+      const toast = document.createElement('div');
+      toast.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0,0,0,0.7);
+        color: #fff;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        z-index: 10000;
+      `;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 2000);
+    }
+
+    // 点赞效果
+    document.querySelectorAll('.stat-item').forEach(item => {
+      item.addEventListener('click', function(e) {
+        if (this.querySelector('span:first-child').textContent === '❤️') {
+          this.classList.toggle('liked');
+          const count = this.querySelector('span:last-child');
+          const current = parseInt(count.textContent);
+          if (this.classList.contains('liked')) {
+            count.textContent = current + 1;
+          } else {
+            count.textContent = Math.max(0, current - 1);
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
