@@ -7,7 +7,7 @@
     "dev:h5": "set UNI_INPUT_DIR=.&& uni",
     "dev:mp-weixin": "set UNI_INPUT_DIR=.&& uni --open --mode mp-weixin",
     "dev:app": "set UNI_INPUT_DIR=.&& uni --open --mode app",
-    "build:h5": "set UNI_INPUT_DIR=.&& uni build",
+    "build:h5": "uni build",
     "build:mp-weixin": "set UNI_INPUT_DIR=.&& uni build --mode mp-weixin",
     "build:app": "set UNI_INPUT_DIR=.&& uni build --mode app"
   },

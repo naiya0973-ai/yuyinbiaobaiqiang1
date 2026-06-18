@@ -39,9 +39,13 @@ jobs:
           cd client
           npm run build:h5
         env:
+          UNI_INPUT_DIR: .
           NODE_ENV: production
           GITHUB_PAGES: 'true'
           VUE_APP_API_URL: ${{ vars.VUE_APP_API_URL }}
+
+      - name: Verify build output
+        run: test -f client/dist/build/h5/index.html
 
       - name: Prepare GitHub Pages
         run: touch client/dist/build/h5/.nojekyll
