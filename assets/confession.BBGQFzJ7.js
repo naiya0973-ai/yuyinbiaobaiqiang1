@@ -1,0 +1,1 @@
+import{r as o,u as a}from"./request.DoIfG2AB.js";const s=(a={})=>o({url:"/confession/list",method:"GET",data:a}),e=a=>o({url:`/confession/${a}`,method:"GET"}),t=a=>o({url:"/confession",method:"POST",data:a}),r=a=>o({url:`/confession/${a}/like`,method:"POST"}),u=(o,s={})=>a({url:"/upload/audio",filePath:o,name:"audio",formData:s});export{e as a,t as c,s as g,r as t,u};
