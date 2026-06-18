@@ -228,9 +228,9 @@ router.post('/', authenticate, createConfessionLimiter, [
         category_id: Number(categoryId),
         title: title || null,
         content: content || null,
-        audio_url: audioUrl || null,
-        audio_duration: audioUrl ? Number(audioDuration || 0) : null,
-        audio_size: audioUrl ? Number(audioSize || 0) : null
+        audio_url: audioUrl || '',
+        audio_duration: audioUrl ? Number(audioDuration || 0) : 0,
+        audio_size: audioUrl ? Number(audioSize || 0) : 0
       })
       .select('id')
       .single();

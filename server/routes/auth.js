@@ -2,16 +2,21 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const { supabaseAdmin } = require('../config/supabase');
 const { generateToken, authenticate } = require('../middleware/auth');
-const { generateNickname, sanitizeInput } = require('../utils/helpers');
+const { generateNickname, generateAnonymousId, sanitizeInput } = require('../utils/helpers');
+const {
+  generateSixDigitCode,
+  assertCanResend,
+  saveSmsCode,
+  verifySmsCode
+} = require('../services/smsService');
 
 const router = express.Router();
 
-// 仅在开发环境允许使用固定验证码
 const isDevelopment = process.env.NODE_ENV !== 'production';
-const MOCK_SMS_CODE = isDevelopment ? process.env.MOCK_SMS_CODE : null;
+const demoSmsCode = process.env.DEMO_SMS_CODE || process.env.MOCK_SMS_CODE || process.env.FIXED_SMS_CODE;
 
-if (isDevelopment && MOCK_SMS_CODE) {
-  console.warn('[SECURITY WARNING] Using fixed SMS code for development:', MOCK_SMS_CODE);
+if (demoSmsCode && /^[0-9]{6}$/.test(String(demoSmsCode).trim())) {
+  console.warn('[AUTH] Demo SMS code enabled for login verification');
 }
 
 function success(res, data = null, message = '操作成功') {
@@ -47,6 +52,7 @@ function normalizeProfile(profile) {
     phone: maskPhone(profile.phone),
     nickname: profile.nickname,
     avatarUrl: profile.avatar_url,
+    anonymousId: profile.anonymous_id,
     createdAt: profile.created_at
   };
 }
@@ -60,7 +66,7 @@ function maskPhone(phone) {
 async function findProfileByPhone(phone) {
   const { data, error } = await supabaseAdmin
     .from('profiles')
-    .select('id, phone, nickname, avatar_url, created_at')
+    .select('id, phone, nickname, avatar_url, anonymous_id, created_at')
     .eq('phone', phone)
     .maybeSingle();
 
@@ -71,15 +77,16 @@ async function findProfileByPhone(phone) {
   return data;
 }
 
-async function createProfile(phone) {
+async function createProfile(phone, nickname) {
   const { data, error } = await supabaseAdmin
     .from('profiles')
     .insert({
       phone,
-      nickname: generateNickname(),
-      avatar_url: null
+      nickname: nickname || generateNickname(),
+      avatar_url: null,
+      anonymous_id: generateAnonymousId()
     })
-    .select('id, phone, nickname, avatar_url, created_at')
+    .select('id, phone, nickname, avatar_url, anonymous_id, created_at')
     .single();
 
   if (error) {
@@ -97,7 +104,21 @@ router.post('/send-code', [
   try {
     if (!handleValidation(req, res)) return;
 
-    return success(res, null, '验证码已发送');
+    const { phone } = req.body;
+    const resendCheck = assertCanResend(phone);
+    if (!resendCheck.ok) {
+      return fail(res, 429, `请${resendCheck.waitSeconds}秒后再试`);
+    }
+
+    const code = generateSixDigitCode();
+    await saveSmsCode(phone, code);
+
+    const payload = { expiresIn: 300 };
+    if (isDevelopment || demoSmsCode) {
+      payload.demoCode = code;
+    }
+
+    return success(res, payload, '验证码已发送');
   } catch (err) {
     console.error('Send code error:', err);
     return fail(res, 500, '服务器内部错误');
@@ -111,27 +132,39 @@ router.post('/login', [
   body('code')
     .isLength({ min: 6, max: 6 })
     .isNumeric()
-    .withMessage('请输入6位数字验证码')
+    .withMessage('请输入6位数字验证码'),
+  body('nickname')
+    .optional()
+    .isLength({ min: 2, max: 20 })
+    .withMessage('昵称长度应在2-20个字符之间')
 ], async (req, res) => {
   try {
     if (!handleValidation(req, res)) return;
 
     const { phone, code } = req.body;
+    const nickname = req.body.nickname ? sanitizeInput(req.body.nickname) : null;
 
-    // 仅在开发环境允许使用固定验证码
-    if (isDevelopment && MOCK_SMS_CODE && code === MOCK_SMS_CODE) {
-      // 开发环境跳过验证码验证
-    } else {
-      // 生产环境必须验证真实验证码
-      // TODO: 这里应该调用真实的短信服务验证验证码
-      return fail(res, 400, '验证码错误');
+    const demoCode = demoSmsCode ? String(demoSmsCode).trim() : null;
+    if (!(demoCode && code === demoCode)) {
+      const verifyResult = await verifySmsCode(phone, code);
+      if (!verifyResult.ok) {
+        return fail(res, 400, verifyResult.message || '验证码错误');
+      }
     }
 
     let profile = await findProfileByPhone(phone);
     const isNewUser = !profile;
 
     if (!profile) {
-      profile = await createProfile(phone);
+      profile = await createProfile(phone, nickname);
+    } else if (nickname && nickname !== profile.nickname) {
+      const { data, error } = await supabaseAdmin
+        .from('profiles')
+        .update({ nickname })
+        .eq('id', profile.id)
+        .select('id, phone, nickname, avatar_url, anonymous_id, created_at')
+        .single();
+      if (!error && data) profile = data;
     }
 
     const token = generateToken(profile.id);
@@ -192,7 +225,7 @@ router.put('/profile', authenticate, [
       .from('profiles')
       .update(updates)
       .eq('id', req.userId)
-      .select('id, phone, nickname, avatar_url, created_at')
+      .select('id, phone, nickname, avatar_url, anonymous_id, created_at')
       .single();
 
     if (error) {

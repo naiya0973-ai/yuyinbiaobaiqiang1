@@ -1,13 +1,16 @@
 # Render 部署配置
-# 访问 https://dashboard.render.com/ 创建新服务
+# 在 Render Dashboard 连接本仓库后，可使用此 Blueprint 一键部署后端
 
 services:
   - type: web
     name: voice-confession-wall-api
-    env: node
+    runtime: node
     plan: free
+    rootDir: server
     buildCommand: npm install
     startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: true
     envVars:
       - key: NODE_ENV
         value: production
@@ -17,11 +20,15 @@ services:
         generateValue: true
       - key: SUPABASE_URL
         sync: false
-      - key: SUPABASE_KEY
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: BASE_URL
         sync: false
       - key: CLIENT_ORIGIN
         value: https://naiya0973-ai.github.io
       - key: ADMIN_ORIGIN
         value: https://naiya0973-ai.github.io
-    healthCheckPath: /health
-    autoDeploy: true
+      - key: DEMO_SMS_CODE
+        value: "123456"

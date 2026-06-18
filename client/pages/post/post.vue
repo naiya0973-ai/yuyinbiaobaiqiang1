@@ -151,6 +151,9 @@ const publishing = ref(false)
 let recordManager = null
 let recordingTimer = null
 let innerAudioContext = null
+let mediaRecorder = null
+let mediaStream = null
+let audioChunks = []
 
 const canPublish = computed(() => {
   const hasContent = content.value.trim().length > 0 || audioFile.value
@@ -195,7 +198,7 @@ const initRecorder = () => {
 }
 // #endif
 
-const startRecording = () => {
+const startRecording = async () => {
   // #ifdef APP-PLUS || MP-WEIXIN
   if (!recordManager) initRecorder()
   isRecording.value = true
@@ -208,7 +211,41 @@ const startRecording = () => {
   })
   // #endif
   // #ifdef H5
-  uni.showToast({ title: '请在App中使用录音', icon: 'none' })
+  if (!navigator.mediaDevices?.getUserMedia) {
+    uni.showToast({ title: '当前浏览器不支持录音', icon: 'none' })
+    return
+  }
+
+  try {
+    mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true })
+    const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+      ? 'audio/webm;codecs=opus'
+      : (MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4')
+    mediaRecorder = new MediaRecorder(mediaStream, { mimeType })
+    audioChunks = []
+    mediaRecorder.ondataavailable = (event) => {
+      if (event.data?.size) audioChunks.push(event.data)
+    }
+    mediaRecorder.onstop = () => {
+      clearInterval(recordingTimer)
+      const blob = new Blob(audioChunks, { type: mimeType })
+      audioFile.value = URL.createObjectURL(blob)
+      audioDuration.value = Math.max(recordingTime.value, 1)
+      mediaStream?.getTracks().forEach((track) => track.stop())
+      mediaStream = null
+      mediaRecorder = null
+    }
+    mediaRecorder.start()
+    isRecording.value = true
+    recordingTime.value = 0
+    recordingTimer = setInterval(() => {
+      recordingTime.value++
+      if (recordingTime.value >= 600) stopRecording()
+    }, 1000)
+  } catch (err) {
+    console.error('H5 recording error:', err)
+    uni.showToast({ title: '无法访问麦克风，请授权后重试', icon: 'none' })
+  }
   // #endif
 }
 
@@ -217,6 +254,12 @@ const stopRecording = () => {
   // #ifdef APP-PLUS || MP-WEIXIN
   isRecording.value = false
   recordManager.stop()
+  // #endif
+  // #ifdef H5
+  isRecording.value = false
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+    mediaRecorder.stop()
+  }
   // #endif
 }
 
@@ -276,11 +319,6 @@ const publish = async () => {
 
     let uploadData = null
     if (audioFile.value) {
-      // 验证文件大小（50MB）
-      const fs = uni.getFileSystemManager()
-      const fileInfo = fs.getFileInfo({ filePath: audioFile.value })
-      const maxSize = 50 * 1024 * 1024 // 50MB
-
       uploadData = await uploadAudio(audioFile.value, {
         duration: audioDuration.value
       })
@@ -325,6 +363,9 @@ const goBack = () => {
 onUnmounted(() => {
   if (innerAudioContext) innerAudioContext.destroy()
   clearInterval(recordingTimer)
+  if (mediaStream) {
+    mediaStream.getTracks().forEach((track) => track.stop())
+  }
 })
 </script>
 

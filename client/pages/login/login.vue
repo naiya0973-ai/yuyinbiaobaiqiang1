@@ -174,9 +174,13 @@ const sendCode = async () => {
 
   try {
     uni.showLoading({ title: '发送中...' })
-    await sendSmsCode(form.value.phone)
+    const result = await sendSmsCode(form.value.phone)
     uni.hideLoading()
     uni.showToast({ title: '验证码已发送', icon: 'success' })
+
+    if (result?.demoCode) {
+      form.value.code = result.demoCode
+    }
 
     countdown.value = 60
     timer = setInterval(() => {
@@ -211,7 +215,7 @@ const handleLogin = async () => {
     const cleanPhone = form.value.phone.trim()
     const cleanCode = form.value.code.trim()
 
-    const data = await login(cleanPhone, cleanCode)
+    const data = await login(cleanPhone, cleanCode, form.value.nickname.trim())
 
     // 重置登录尝试次数
     loginAttempts.value = 0

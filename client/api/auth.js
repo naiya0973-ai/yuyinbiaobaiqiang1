@@ -10,11 +10,11 @@ export const sendSmsCode = (phone) => {
 }
 
 // Login with phone and code
-export const login = (phone, code) => {
+export const login = (phone, code, nickname) => {
   return request({
     url: '/auth/login',
     method: 'POST',
-    data: { phone, code }
+    data: { phone, code, nickname }
   })
 }
 

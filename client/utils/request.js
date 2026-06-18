@@ -98,10 +98,19 @@ const handleAuthError = (message) => {
 
 // 获取允许的域名白名单
 const getAllowedDomains = () => {
-  // 从环境变量或配置中读取允许的域名
-  const defaultDomains = ['localhost']
-  // 在生产环境中应该从安全配置读取
-  return defaultDomains
+  const domains = ['localhost', '127.0.0.1', 'github.io', 'onrender.com', 'supabase.co']
+  try {
+    const apiUrl = process.env.VUE_APP_API_URL || process.env.API_BASE_URL || ''
+    if (apiUrl) {
+      const hostname = new URL(apiUrl).hostname
+      if (hostname && !domains.includes(hostname)) {
+        domains.push(hostname)
+      }
+    }
+  } catch {
+    // ignore invalid API URL during local dev
+  }
+  return domains
 }
 
 // Upload file with security checks
