@@ -1,0 +1,27 @@
+# Render 部署配置
+# 访问 https://dashboard.render.com/ 创建新服务
+
+services:
+  - type: web
+    name: voice-confession-wall-api
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: CLIENT_ORIGIN
+        value: https://naiya0973-ai.github.io
+      - key: ADMIN_ORIGIN
+        value: https://naiya0973-ai.github.io
+    healthCheckPath: /health
+    autoDeploy: true

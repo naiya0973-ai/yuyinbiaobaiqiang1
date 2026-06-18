@@ -108,6 +108,14 @@ app.use('/api/report', reportLimiter, require('./routes/report'));
 app.use('/api/admin', require('./routes/admin'));
 
 // Health check
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    version: '1.0.0'
+  });
+});
+
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
