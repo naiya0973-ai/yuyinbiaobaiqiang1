@@ -139,18 +139,36 @@ const form = ref({
 const loading = ref(false)
 const countdown = ref(0)
 const agreed = ref(false)
+const loginAttempts = ref(0) // 登录尝试次数
+const maxLoginAttempts = 5  // 最大登录尝试次数
 
-const isPhoneValid = computed(() => /^1[3-9]\d{9}$/.test(form.value.phone))
+// 验证手机号格式
+const isPhoneValid = computed(() => {
+  // 严格验证中国大陆手机号
+  return /^1[3-9]\d{9}$/.test(form.value.phone)
+})
+
+// 验证昵称（防止 XSS）
+const isNicknameValid = computed(() => {
+  const nickname = form.value.nickname.trim()
+  // 长度检查
+  if (nickname.length < 2 || nickname.length > 20) return false
+  // 防止特殊字符和脚本注入
+  const dangerousChars = /[<>\"'\/&%]/
+  return !dangerousChars.test(nickname)
+})
 
 const isFormValid = computed(() => {
-  return form.value.nickname.trim().length >= 2 &&
+  return isNicknameValid.value &&
          isPhoneValid.value &&
-         form.value.code.length === 6 &&
+         /^\d{6}$/.test(form.value.code) &&
          agreed.value
 })
 
 let timer = null
+let lockTimer = null
 
+// 发送验证码
 const sendCode = async () => {
   if (countdown.value > 0 || !isPhoneValid.value) return
 
@@ -167,19 +185,48 @@ const sendCode = async () => {
     }, 1000)
   } catch (err) {
     uni.hideLoading()
+    console.error('Send code error:', err)
   }
 }
 
+// 处理登录
 const handleLogin = async () => {
   if (!isFormValid.value) return
 
+  // 检查登录尝试次数
+  if (loginAttempts.value >= maxLoginAttempts) {
+    uni.showToast({
+      title: '登录尝试次数过多，请稍后再试',
+      icon: 'none',
+      duration: 2000
+    })
+    return
+  }
+
   loading.value = true
+  loginAttempts.value++
+
   try {
-    const data = await login(form.value.phone, form.value.code)
+    // 清理输入，防止 XSS
+    const cleanPhone = form.value.phone.trim()
+    const cleanCode = form.value.code.trim()
+
+    const data = await login(cleanPhone, cleanCode)
+
+    // 重置登录尝试次数
+    loginAttempts.value = 0
 
     // 更新昵称
     if (form.value.nickname) {
-      // 这里可以调用更新昵称的API
+      // 清理昵称中的危险字符
+      const cleanNickname = form.value.nickname
+        .replace(/[<>\"'\/&]/g, '')
+        .trim()
+        .substring(0, 20)
+
+      if (cleanNickname && cleanNickname !== form.value.nickname) {
+        // 如果昵称被清理了，可以调用更新昵称的API
+      }
     }
 
     userStore.login(data)
@@ -190,6 +237,19 @@ const handleLogin = async () => {
     }, 1500)
   } catch (err) {
     console.error('Login error:', err)
+
+    // 如果达到最大尝试次数，锁定一段时间
+    if (loginAttempts.value >= maxLoginAttempts) {
+      uni.showToast({
+        title: '登录尝试次数过多，请5分钟后重试',
+        icon: 'none',
+        duration: 3000
+      })
+      // 5分钟后重置
+      lockTimer = setTimeout(() => {
+        loginAttempts.value = 0
+      }, 5 * 60 * 1000)
+    }
   } finally {
     loading.value = false
   }

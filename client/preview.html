@@ -1,1 +1,1261 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Taking HTML</title><style>*{box-sizing:border-box}body{margin:0;font-family:Arial,"Microsoft YaHei",sans-serif;background:linear-gradient(135deg,#ffe4ec,#ffb8c9);color:#333}.box{max-width:430px;height:100vh;margin:auto;background:#fff5f7;position:relative;overflow:hidden}.page{display:none;height:100%;overflow:auto;padding:24px 16px 84px}.on{display:block}.nav{position:absolute;bottom:0;left:0;right:0;height:68px;background:white;display:none;border-top:1px solid #ffe4ec}.nav button{flex:1;border:0;background:white;color:#999}.nav .a{color:#ff6b9d;font-weight:700}.nav b{display:block;font-size:22px}.title{font-size:26px;font-weight:900;color:#ff6b9d}.sub,.time{font-size:13px;color:#999}.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}.card{background:white;border-radius:20px;padding:16px;margin-bottom:14px;box-shadow:0 12px 28px #ff6b9d22}.btn{border:0;border-radius:22px;padding:13px 18px;background:linear-gradient(135deg,#ff6b9d,#ff8fb3);color:white;font-weight:900}.wide{width:100%}.ghost{border:0;border-radius:18px;padding:10px 14px;background:white;color:#ff6b9d;font-weight:800}.back{width:38px;height:38px;border:0;border-radius:50%;background:white;color:#ff6b9d}.hero{height:100%;display:grid;place-items:center;text-align:center}.brand{font-size:56px;font-weight:1000;color:#ff6b9d;letter-spacing:4px}.bubble{width:180px;height:180px;border-radius:45%;background:white;display:grid;place-items:center;font-size:80px;margin:32px auto;box-shadow:0 16px 38px #ff6b9d33}label{display:block;margin:12px 0 6px;color:#666;font-weight:700;font-size:13px}input,textarea{width:100%;border:1px solid #ffe4ec;border-radius:16px;padding:12px;outline:0}textarea{height:96px;resize:none}.row{display:flex;gap:10px}.row>*{flex:1}.tabs{display:flex;gap:8px;overflow:auto;margin:8px 0 14px}.tab{border:0;border-radius:99px;padding:8px 12px;background:white;color:#777;white-space:nowrap}.tab.a{background:#ff6b9d;color:white}.head{display:flex;align-items:center;gap:10px;margin-bottom:10px}.av{width:42px;height:42px;border-radius:50%;background:#ff6b9d;color:white;display:grid;place-items:center;font-weight:900;flex:none}.grow{flex:1}.name{font-weight:900}.tag{font-size:12px;color:#ff6b9d;background:#ffe4ec;border-radius:99px;padding:5px 10px}.txt{line-height:1.6;color:#555;margin-bottom:12px}.player{display:flex;align-items:center;gap:10px;background:#fff7fa;border-radius:16px;padding:12px}.play{width:38px;height:38px;border:0;border-radius:50%;background:#ff6b9d;color:white}.wave{flex:1;height:24px;background:repeating-linear-gradient(90deg,#ffb8c9 0 4px,transparent 4px 8px);border-radius:8px}.playing{animation:p .7s infinite alternate}@keyframes p{to{opacity:.45}}.acts{display:flex;justify-content:space-between;margin-top:12px;color:#777;font-size:13px}.acts button{border:0;background:0;color:inherit}.liked{color:#f36!important}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.cat{border-radius:20px;padding:16px;min-height:115px;color:white;display:flex;flex-direction:column;justify-content:space-between}.rec{width:120px;height:120px;border:0;border-radius:50%;font-size:52px;color:white;background:#ff6b9d}.rec.a{box-shadow:0 0 0 18px #ff6b9d22}.toast{position:absolute;left:50%;bottom:82px;transform:translateX(-50%);background:#333d;color:white;padding:10px 14px;border-radius:99px;opacity:0;transition:.2s;white-space:nowrap}.toast.a{opacity:1}.empty{text-align:center;color:#999;padding:30px}.comment{display:flex;gap:10px;margin:10px 0}.comment .av{width:32px;height:32px;font-size:13px}.cbody{background:#fff7fa;border-radius:14px;padding:9px;flex:1}@media(min-width:520px){.box{height:860px;margin:20px auto;border-radius:36px;box-shadow:0 30px 80px #0003}}</style></head><body><main class="box"><section id="welcome" class="page on"><div class="hero"><div><div class="brand">Taking</div><p class="sub">说出你的心声</p><div class="bubble">💭</div><button class="btn wide" onclick="show('login')">进入</button><br><br><button class="ghost" onclick="guest()">游客体验</button></div></div></section><section id="login" class="page"><div class="top"><button class="back" onclick="show('welcome')">←</button><div class="grow"><div class="title">登录</div><p class="sub">验证码固定 123456</p></div></div><div class="card"><label>昵称</label><input id="name" placeholder="温柔的小猫"><label>手机号</label><input id="phone" placeholder="请输入手机号"><label>验证码</label><div class="row"><input id="code" placeholder="123456"><button class="btn" onclick="msg('验证码：123456')">获取</button></div><br><button class="btn wide" onclick="login()">开始倾诉</button></div></section><section id="home" class="page"><div class="top"><div><div class="title">💭 Taking</div><p class="sub">语音广场</p></div><button class="back" onclick="msg('搜索演示中')">🔍</button></div><div id="tabs" class="tabs"></div><div id="list"></div></section><section id="post" class="page"><div class="top"><button class="back" onclick="nav('home')">×</button><div class="title">发布</div><button class="ghost" onclick="pub()">发布</button></div><div class="card"><label>分类</label><div id="ptabs" class="tabs"></div><label>内容</label><textarea id="content" placeholder="写下你的心声..."></textarea></div><div class="card" style="text-align:center"><button id="rec" class="rec" onclick="rec()">🎤</button><p id="rt" class="sub">点击模拟录音</p></div></section><section id="detail" class="page"><div class="top"><button class="back" onclick="nav('home')">←</button><div class="title">详情</div><button class="back" onclick="msg('举报成功')">⋯</button></div><div id="detailBox"></div></section><section id="category" class="page"><div class="top"><div><div class="title">分类</div><p class="sub">探索心情</p></div></div><div id="grid" class="grid"></div><div class="card" style="text-align:center"><h3>🎲 随机发现</h3><p class="sub">随机听一条</p><button class="btn wide" onclick="randomV()">开始</button></div></section><section id="ranking" class="page"><div class="top"><div><div class="title">榜单</div><p class="sub">热门声音</p></div></div><div id="rank"></div></section><section id="profile" class="page"><div class="top"><div><div class="title">我的</div><p class="sub">个人中心</p></div></div><div class="card" style="text-align:center"><div id="pav" class="av" style="width:76px;height:76px;margin:auto;font-size:28px">我</div><h2 id="pname">未登录</h2><p id="pphone" class="sub">游客</p><div class="row"><div><b id="mc">0</b><p class="time">发布</p></div><div><b id="ml">0</b><p class="time">获赞</p></div><div><b id="mp">0</b><p class="time">播放</p></div></div></div><button class="btn wide" onclick="reset()">退出 / 重置</button></section><nav id="nav" class="nav"><button data-n="home" onclick="nav('home')"><b>🏠</b>广场</button><button data-n="category" onclick="nav('category')"><b>📂</b>分类</button><button data-n="post" onclick="nav('post')"><b>＋</b>发布</button><button data-n="ranking" onclick="nav('ranking')"><b>🏆</b>榜单</button><button data-n="profile" onclick="nav('profile')"><b>👤</b>我的</button></nav><div id="toast" class="toast"></div></main><script>const C=[['全部','🌈'],['暗恋','💕'],['失恋','💔'],['感谢','🙏'],['道歉','😔'],['吐槽','😤'],['其他','💭']],G=['#ff6b9d,#ff8fb3','#ff9a9e,#fecfef','#a18cd1,#fbc2eb','#89f7fe,#66a6ff','#ffecd2,#fcb69f','#f6d365,#fda085','#d299c2,#fef9d7'];const D=[{id:1,u:'温柔的小猫',cat:1,t:'今天在图书馆又看见你了，想说的话还是没有说出口。',d:42,l:28,p:156,c:[['云朵','勇敢一点呀！']],like:0,time:'10分钟前'},{id:2,u:'安静的星星',cat:3,t:'谢谢雨天借我伞的人，那天真的被温柔接住了。',d:36,l:42,p:210,c:[['青鸟','好暖。']],like:1,time:'28分钟前'},{id:3,u:'勇敢的海风',cat:5,t:'期末周真的太难了，希望听到这条的人也能撑过去。',d:58,l:19,p:93,c:[],like:0,time:'1小时前'}];let S=JSON.parse(localStorage.tk||'null')||{user:null,v:D,cat:0,pcat:1,cur:1,play:null,rec:0};const $=x=>document.getElementById(x),save=()=>localStorage.tk=JSON.stringify(S);function msg(t){$('toast').textContent=t;$('toast').classList.add('a');clearTimeout(window.t);window.t=setTimeout(()=>$('toast').classList.remove('a'),1500)}function show(id){document.querySelectorAll('.page').forEach(e=>e.classList.remove('on'));$(id).classList.add('on');$('nav').style.display=['home','post','detail','category','ranking','profile'].includes(id)?'flex':'none';if(id=='home')home();if(id=='category')cat();if(id=='ranking')rank();if(id=='profile')profile();if(id=='detail')detail()}function nav(id){document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('a',b.dataset.n==id));show(id)}function guest(){S.user={name:'游客小猫',phone:'guest'};save();nav('home')}function login(){let n=$('name').value.trim()||'温柔的小猫',p=$('phone').value.trim(),c=$('code').value.trim();if(!/^1[3-9]\d{9}$/.test(p))return msg('手机号不正确');if(c!='123456')return msg('验证码错误');S.user={name:n,phone:p};save();msg('登录成功');nav('home')}function renderTabs(){$('tabs').innerHTML=C.map((x,i)=>`<button class="tab ${S.cat==i?'a':''}" onclick="S.cat=${i};save();home()">${x[1]} ${x[0]}</button>`).join('');$('ptabs').innerHTML=C.slice(1).map((x,i)=>`<button class="tab ${S.pcat==i+1?'a':''}" onclick="S.pcat=${i+1};save();renderTabs()">${x[1]} ${x[0]}</button>`).join('')}function card(v){return `<div class="card" onclick="openD(${v.id})"><div class="head"><div class="av">${v.u[0]}</div><div class="grow"><div class="name">${v.u}</div><div class="time">${v.time}</div></div><span class="tag">${C[v.cat][1]} ${C[v.cat][0]}</span></div><div class="txt">${v.t}</div><div class="player" onclick="event.stopPropagation();play(${v.id})"><button class="play">${S.play==v.id?'⏸':'▶'}</button><div class="wave ${S.play==v.id?'playing':''}"></div><span class="time">00:${v.d}</span></div><div class="acts"><button class="${v.like?'liked':''}" onclick="event.stopPropagation();like(${v.id})">❤️ ${v.l}</button><span>💬 ${v.c.length}</span><span>👁️ ${v.p}</span><button onclick="event.stopPropagation();msg('举报成功')">⋯</button></div></div>`}function home(){renderTabs();let a=S.v.filter(v=>!S.cat||v.cat==S.cat);$('list').innerHTML=a.length?a.map(card).join(''):'<div class="empty">还没有语音</div>'}function play(id){S.play=S.play==id?null:id;let v=S.v.find(x=>x.id==id);if(S.play&&v)v.p++;save();home();if($('detail').classList.contains('on'))detail()}function like(id){let v=S.v.find(x=>x.id==id);v.like=!v.like;v.l+=v.like?1:-1;save();home();if($('detail').classList.contains('on'))detail()}function openD(id){S.cur=id;save();show('detail')}function detail(){let v=S.v.find(x=>x.id==S.cur)||S.v[0];$('detailBox').innerHTML=card(v)+`<div class="card"><b>评论 (${v.c.length})</b>${v.c.map(x=>`<div class="comment"><div class="av">${x[0][0]}</div><div class="cbody"><b>${x[0]}</b><p>${x[1]}</p></div></div>`).join('')||'<div class="empty">暂无评论</div>'}<div class="row"><input id="ci" placeholder="写评论"><button class="btn" onclick="comment(${v.id})">发送</button></div></div>`}function comment(id){let t=$('ci').value.trim();if(!t)return msg('请输入评论');let v=S.v.find(x=>x.id==id);v.c.unshift([S.user?.name||'游客',t]);save();detail();msg('评论成功')}function rec(){S.rec=!S.rec;$('rec').classList.toggle('a',S.rec);$('rt').textContent=S.rec?'已生成模拟语音':'点击模拟录音';save()}function pub(){if(!S.user)return msg('请先登录');let t=$('content').value.trim();if(!t)return msg('请输入内容');if(!S.rec)return msg('请先录音');S.v.unshift({id:Date.now(),u:S.user.name,cat:S.pcat,t,d:30+Math.floor(Math.random()*40),l:0,p:0,c:[],like:0,time:'刚刚'});$('content').value='';S.rec=0;save();msg('发布成功');nav('home')}function cat(){$('grid').innerHTML=C.slice(1).map((x,i)=>`<div class="cat" style="background:linear-gradient(135deg,${G[i+1]})" onclick="S.cat=${i+1};save();nav('home')"><h1>${x[1]}</h1><div><b>${x[0]}</b><p>${S.v.filter(v=>v.cat==i+1).length} 条语音</p></div></div>`).join('')}function randomV(){openD(S.v[Math.floor(Math.random()*S.v.length)].id)}function rank(){$('rank').innerHTML=[...S.v].sort((a,b)=>(b.l*2+b.c.length*3+b.p*.5)-(a.l*2+a.c.length*3+a.p*.5)).map((v,i)=>`<div class="card" onclick="openD(${v.id})"><b style="color:#ff6b9d">#${i+1}</b> ${v.t.slice(0,24)}<p class="time">${v.u} · 🔥 ${Math.round(v.l*2+v.c.length*3+v.p*.5)}</p></div>`).join('')}function profile(){let u=S.user||{name:'未登录',phone:'游客'},m=S.v.filter(v=>S.user&&v.u==S.user.name);$('pav').textContent=u.name[0];$('pname').textContent=u.name;$('pphone').textContent=u.phone;$('mc').textContent=m.length;$('ml').textContent=m.reduce((s,v)=>s+v.l,0);$('mp').textContent=m.reduce((s,v)=>s+v.p,0)}function reset(){localStorage.removeItem('tk');location.reload()}renderTabs();</script></body></html>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <!-- 内容安全策略 (CSP) - 防止 XSS 攻击 -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline';
+    style-src 'self' 'unsafe-inline';
+    img-src 'self' data:;
+    media-src 'self';
+    connect-src 'self';
+    font-src 'self';
+    object-src 'none';
+    frame-ancestors 'none';
+    base-uri 'self';
+    form-action 'self';
+  ">
+
+  <!-- 防止点击劫持 -->
+  <meta http-equiv="X-Frame-Options" content="DENY">
+
+  <!-- XSS 保护 -->
+  <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+
+  <!-- 防止 MIME 类型嗅探 -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+
+  <!-- 引用策略 -->
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+
+  <title>Taking HTML</title>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Arial,"Microsoft YaHei",sans-serif;background:linear-gradient(135deg,#ffe4ec,#ffb8c9);color:#333}
+    .box{max-width:430px;height:100vh;margin:auto;background:#fff5f7;position:relative;overflow:hidden}
+    .page{display:none;height:100%;overflow:auto;padding:24px 16px 84px}
+    .on{display:block}
+    .nav{position:absolute;bottom:0;left:0;right:0;height:68px;background:white;display:none;border-top:1px solid #ffe4ec}
+    .nav button{flex:1;border:0;background:white;color:#999}
+    .nav .a{color:#ff6b9d;font-weight:700}
+    .nav b{display:block;font-size:22px}
+    .title{font-size:26px;font-weight:900;color:#ff6b9d}
+    .sub,.time{font-size:13px;color:#999}
+    .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+    .card{background:white;border-radius:20px;padding:16px;margin-bottom:14px;box-shadow:0 12px 28px #ff6b9d22}
+    .btn{border:0;border-radius:22px;padding:13px 18px;background:linear-gradient(135deg,#ff6b9d,#ff8fb3);color:white;font-weight:900}
+    .wide{width:100%}
+    .ghost{border:0;border-radius:18px;padding:10px 14px;background:white;color:#ff6b9d;font-weight:800;cursor:pointer}
+    .ghost:hover{background:#fff0f3}
+    .ghost:active{transform:scale(0.95)}
+    .back{width:38px;height:38px;border:0;border-radius:50%;background:white;color:#ff6b9d}
+    .hero{height:100%;display:grid;place-items:center;text-align:center}
+    .brand{font-size:56px;font-weight:1000;color:#ff6b9d;letter-spacing:4px}
+    .bubble{width:180px;height:180px;border-radius:45%;background:white;display:grid;place-items:center;font-size:80px;margin:32px auto;box-shadow:0 16px 38px #ff6b9d33}
+    label{display:block;margin:12px 0 6px;color:#666;font-weight:700;font-size:13px}
+    input,textarea{width:100%;border:1px solid #ffe4ec;border-radius:16px;padding:12px;outline:0}
+    textarea{height:96px;resize:none}
+    .row{display:flex;gap:10px}
+    .row>*{flex:1}
+    .tabs{display:flex;gap:8px;overflow:auto;margin:8px 0 14px}
+    .tab{border:0;border-radius:99px;padding:8px 12px;background:white;color:#777;white-space:nowrap}
+    .tab.a{background:#ff6b9d;color:white}
+    .head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+    .av{width:42px;height:42px;border-radius:50%;background:#ff6b9d;color:white;display:grid;place-items:center;font-weight:900;flex:none}
+    .grow{flex:1}
+    .name{font-weight:900}
+    .tag{font-size:12px;color:#ff6b9d;background:#ffe4ec;border-radius:99px;padding:5px 10px}
+    .txt{line-height:1.6;color:#555;margin-bottom:12px}
+    .player{display:flex;align-items:center;gap:10px;background:#fff7fa;border-radius:16px;padding:12px}
+    .play{width:38px;height:38px;border:0;border-radius:50%;background:#ff6b9d;color:white}
+    .wave{flex:1;height:24px;background:repeating-linear-gradient(90deg,#ffb8c9 0 4px,transparent 4px 8px);border-radius:8px}
+    .playing{animation:p .7s infinite alternate}
+    @keyframes p{to{opacity:.45}}
+    .acts{display:flex;justify-content:space-between;margin-top:12px;color:#777;font-size:13px;align-items:center}
+    .acts button{border:0;background:transparent;color:inherit;padding:6px 10px;display:flex;align-items:center;gap:4px;cursor:pointer;border-radius:8px;transition:all 0.2s;font-size:13px}
+    .acts button:hover{background:#f5f5f5}
+    .acts button:active{transform:scale(0.95)}
+    .liked{color:#f36!important}
+    .collected{color:#FFD700!important}
+    .more-menu{position:absolute;right:10px;bottom:45px;background:white;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.15);padding:8px 0;min-width:140px;z-index:100;display:none}
+    .more-menu.show{display:block}
+    .more-menu-item{padding:12px 16px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:10px;font-size:14px;color:#333}
+    .more-menu-item:hover{background:#f5f5f5}
+    .more-btn{position:relative}
+    .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
+    .modal-overlay.show{display:flex}
+    .comment-modal{background:white;width:100%;max-width:430px;max-height:80vh;border-radius:24px 24px 0 0;padding:20px;animation:slideUp 0.3s ease;overflow:hidden}
+    @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+    .comment-modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f0f0f0}
+    .comment-modal-title{font-size:18px;font-weight:bold;color:#333}
+    .comment-close{width:32px;height:32px;border:0;background:#f5f5f5;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+    .comment-list{max-height:calc(80vh - 200px);overflow-y:auto;padding-right:8px}
+    .comment-item{display:flex;gap:12px;margin-bottom:16px}
+    .comment-item .av{width:36px;height:36px;font-size:14px}
+    .comment-content{flex:1}
+    .comment-author{font-weight:bold;color:#333;font-size:14px;margin-bottom:4px}
+    .comment-text{color:#555;font-size:14px;line-height:1.5}
+    .comment-time{color:#999;font-size:12px;margin-top:4px}
+    .comment-input-area{display:flex;gap:10px;margin-top:16px;padding-top:16px;border-top:1px solid #f0f0f0}
+    .comment-input{flex:1;border:1px solid #ffe4ec;border-radius:20px;padding:12px 16px;outline:none;font-size:14px}
+    .comment-send{padding:12px 24px;background:linear-gradient(135deg,#ff6b9d,#ff8fb3);color:white;border:0;border-radius:20px;font-weight:bold;cursor:pointer;font-size:14px}
+    .comment-send:disabled{background:#ddd;cursor:not-allowed}
+    .view-count{color:#999}
+    .cat{border-radius:20px;padding:16px;min-height:115px;color:white;display:flex;flex-direction:column;justify-content:space-between}
+    .rec{width:120px;height:120px;border:0;border-radius:50%;font-size:52px;color:white;background:#ff6b9d;cursor:pointer;transition:all 0.3s}
+    .rec.a{box-shadow:0 0 0 18px #ff6b9d22;background:#4CAF50}
+    .rec:active{transform:scale(0.95)}
+    .toast{position:absolute;left:50%;bottom:82px;transform:translateX(-50%);background:#333d;color:white;padding:10px 14px;border-radius:99px;opacity:0;transition:.2s;white-space:nowrap}
+    .toast.a{opacity:1}
+    .profile-stats{display:flex;justify-content:space-around;padding:20px 0;border-top:1px solid #f0f0f0;margin-top:16px}
+    .profile-stats>div{text-align:center;cursor:pointer;padding:8px 16px;border-radius:12px;transition:all 0.2s}
+    .profile-stats>div:hover{background:#f5f5f5}
+    .profile-stats b{display:block;font-size:28px;color:#ff6b9d;margin-bottom:4px}
+    .profile-stats .time{font-size:13px;color:#666}
+    .profile-menu{background:white;margin:0 16px 16px;border-radius:20px;padding:8px 0;box-shadow:0 4px 20px rgba(0,0,0,0.05)}
+    .profile-menu-item{display:flex;align-items:center;padding:16px 20px;cursor:pointer;transition:all 0.2s;border-bottom:1px solid #f5f5f5}
+    .profile-menu-item:last-child{border-bottom:none}
+    .profile-menu-item:hover{background:#f5f5f5}
+    .profile-menu-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-right:16px;font-size:20px}
+    .profile-menu-text{flex:1;font-size:15px;color:#333;font-weight:500}
+    .profile-menu-arrow{color:#ccc;font-size:20px}
+    .edit-btn{position:absolute;right:0;top:0;background:#ff6b9d;color:white;border:0;padding:8px 16px;border-radius:20px;font-size:13px;cursor:pointer}
+    .edit-avatar-btn{position:absolute;bottom:0;right:0;width:28px;height:28px;background:#ff6b9d;color:white;border:0;border-radius:50%;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+    .avatar-wrapper{position:relative;width:76px;height:76px;margin:auto}
+    .sub-page{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#fff5f7;z-index:300;overflow:auto}
+    .sub-page.show{display:block}
+    .sub-page-header{position:sticky;top:0;background:white;padding:16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #f0f0f0;z-index:10}
+    .sub-page-title{flex:1;font-size:18px;font-weight:bold;color:#333}
+    .sub-page-content{padding:16px;padding-bottom:80px}
+    .edit-modal{background:white;margin:16px;border-radius:20px;padding:20px}
+    .edit-modal label{display:block;margin-bottom:8px;color:#666;font-size:14px;font-weight:500}
+    .edit-modal input{width:100%;border:1px solid #ffe4ec;border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:15px;outline:none}
+    .empty-state{text-align:center;padding:60px 20px;color:#999}
+    .empty-state-icon{font-size:60px;margin-bottom:16px}
+    .fan-item{display:flex;align-items:center;padding:16px;border-bottom:1px solid #f5f5f5}
+    .fan-avatar{width:48px;height:48px;border-radius:50%;background:#ff6b9d;color:white;display:flex;align-items:center;justify-content:center;margin-right:16px;font-size:20px}
+    .fan-info{flex:1}
+    .fan-name{font-weight:500;color:#333;margin-bottom:4px}
+    .fan-id{font-size:12px;color:#999}
+    .fan-btn{padding:8px 16px;background:#ff6b9d;color:white;border:0;border-radius:20px;font-size:13px;cursor:pointer}
+    .fan-btn.following{background:#f0f0f0;color:#666}
+  </style>
+</head>
+<body>
+  <main class="box">
+    <section id="welcome" class="page on">
+      <div class="hero">
+        <div>
+          <div class="brand">Taking</div>
+          <p class="sub">说出你的心声</p>
+          <div class="bubble">💭</div>
+          <button class="btn wide" onclick="show('login')">进入</button><br><br>
+          <button class="ghost" onclick="guest()">游客体验</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="login" class="page">
+      <div class="top">
+        <button class="back" onclick="show('welcome')">←</button>
+        <div class="grow">
+          <div class="title">登录</div>
+          <p class="sub">验证码已发送至手机</p>
+        </div>
+      </div>
+      <div class="card">
+        <label>昵称</label>
+        <input id="name" placeholder="温柔的小猫" maxlength="20">
+        <label>手机号</label>
+        <input id="phone" placeholder="请输入手机号" maxlength="11" type="tel">
+        <label>验证码</label>
+        <div class="row">
+          <input id="code" placeholder="请输入6位验证码" maxlength="6" type="tel">
+          <button class="btn" onclick="sendCode()">获取</button>
+        </div>
+        <br>
+        <button class="btn wide" onclick="login()">开始倾诉</button>
+      </div>
+    </section>
+
+    <section id="home" class="page">
+      <div class="top">
+        <div>
+          <div class="title">💭 Taking</div>
+          <p class="sub">语音广场</p>
+        </div>
+        <button class="back" onclick="msg('搜索演示中')">🔍</button>
+      </div>
+      <div id="tabs" class="tabs"></div>
+      <div id="list"></div>
+    </section>
+
+    <section id="post" class="page">
+      <div class="top">
+        <button class="back" onclick="nav('home')">×</button>
+        <div class="title">发布</div>
+        <button class="ghost" onclick="pub()">发布</button>
+      </div>
+      <div class="card">
+        <label>分类</label>
+        <div id="ptabs" class="tabs"></div>
+        <label>内容</label>
+        <textarea id="content" placeholder="写下你的心声..." maxlength="500"></textarea>
+      </div>
+      <div class="card" style="text-align:center">
+        <button id="rec" class="rec" onclick="rec()">🎤</button>
+        <p id="rt" class="sub" style="margin-top:10px;">点击麦克风按钮生成模拟语音</p>
+      </div>
+    </section>
+
+    <section id="detail" class="page">
+      <div class="top">
+        <button class="back" onclick="nav('home')">←</button>
+        <div class="title">详情</div>
+        <button class="back" onclick="msg('举报成功')">⋯</button>
+      </div>
+      <div id="detailBox"></div>
+    </section>
+
+    <section id="category" class="page">
+      <div class="top">
+        <div>
+          <div class="title">分类</div>
+          <p class="sub">探索心情</p>
+        </div>
+      </div>
+      <div id="grid" class="grid"></div>
+      <div class="card" style="text-align:center">
+        <h3>🎲 随机发现</h3>
+        <p class="sub">随机听一条</p>
+        <button class="btn wide" onclick="randomV()">开始</button>
+      </div>
+    </section>
+
+    <section id="ranking" class="page">
+      <div class="top">
+        <div>
+          <div class="title">榜单</div>
+          <p class="sub">热门声音</p>
+        </div>
+      </div>
+      <div id="rank"></div>
+    </section>
+
+    <section id="profile" class="page">
+      <div class="top">
+        <div>
+          <div class="title">我的</div>
+          <p class="sub">个人中心</p>
+        </div>
+        <button class="ghost" onclick="openEditProfile()" style="padding:8px 16px;font-size:13px">编辑主页</button>
+      </div>
+
+      <div class="card" style="text-align:center;position:relative;margin:0 16px 16px">
+        <div class="avatar-wrapper">
+          <div id="pav" class="av" style="width:76px;height:76px;font-size:28px;margin:0">我</div>
+          <button class="edit-avatar-btn" onclick="changeAvatar()">📷</button>
+        </div>
+        <h2 id="pname" style="margin-top:16px;margin-bottom:4px">未登录</h2>
+        <p id="pphone" class="sub">游客</p>
+
+        <div class="profile-stats" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">
+          <div onclick="showSubPage('myWorks')">
+            <b id="mc">0</b>
+            <p class="time">发布</p>
+          </div>
+          <div onclick="showSubPage('myLikes')">
+            <b id="mLikes">0</b>
+            <p class="time">点赞</p>
+          </div>
+          <div onclick="showSubPage('myCollections')">
+            <b id="mCollections">0</b>
+            <p class="time">收藏</p>
+          </div>
+          <div>
+            <b id="mTotalLikes">0</b>
+            <p class="time">获赞</p>
+          </div>
+          <div onclick="showSubPage('myFans')">
+            <b id="mFans">0</b>
+            <p class="time">粉丝</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-menu">
+        <div class="profile-menu-item" onclick="showSubPage('myWorks')">
+          <div class="profile-menu-icon" style="background:#FFE4EC">📝</div>
+          <div class="profile-menu-text">我的作品</div>
+          <span class="profile-menu-arrow">›</span>
+        </div>
+        <div class="profile-menu-item" onclick="showSubPage('myLikes')">
+          <div class="profile-menu-icon" style="background:#FFE4EC">❤️</div>
+          <div class="profile-menu-text">我点赞的</div>
+          <span class="profile-menu-arrow">›</span>
+        </div>
+        <div class="profile-menu-item" onclick="showSubPage('myCollections')">
+          <div class="profile-menu-icon" style="background:#FFF4E4">⭐</div>
+          <div class="profile-menu-text">我的收藏</div>
+          <span class="profile-menu-arrow">›</span>
+        </div>
+        <div class="profile-menu-item" onclick="showSubPage('myHistory')">
+          <div class="profile-menu-icon" style="background:#E4F8FF">🕐</div>
+          <div class="profile-menu-text">浏览记录</div>
+          <span class="profile-menu-arrow">›</span>
+        </div>
+      </div>
+
+      <div class="profile-menu">
+        <div class="profile-menu-item" onclick="showSubPage('myStats')">
+          <div class="profile-menu-icon" style="background:#F0E4FF">📊</div>
+          <div class="profile-menu-text">数据中心</div>
+          <span class="profile-menu-arrow">›</span>
+        </div>
+        <div class="profile-menu-item" onclick="msg('设置功能开发中')">
+          <div class="profile-menu-icon" style="background:#E8F5E9">⚙️</div>
+          <div class="profile-menu-text">设置</div>
+          <span class="profile-menu-arrow">›</span>
+        </div>
+      </div>
+
+      <div style="padding:0 16px">
+        <button class="btn wide" onclick="reset()" style="background:#f5f5f5;color:#666;margin-top:8px">退出登录</button>
+      </div>
+    </section>
+
+    <nav id="nav" class="nav">
+      <button data-n="home" onclick="nav('home')"><b>🏠</b>广场</button>
+      <button data-n="category" onclick="nav('category')"><b>📂</b>分类</button>
+      <button data-n="post" onclick="nav('post')"><b>＋</b>发布</button>
+      <button data-n="ranking" onclick="nav('ranking')"><b>🏆</b>榜单</button>
+      <button data-n="profile" onclick="nav('profile')"><b>👤</b>我的</button>
+    </nav>
+
+    <div id="toast" class="toast"></div>
+
+    <!-- 子页面容器 -->
+    <div id="subPage" class="sub-page">
+      <div class="sub-page-header">
+        <button class="back" onclick="closeSubPage()">←</button>
+        <div class="sub-page-title" id="subPageTitle">标题</div>
+      </div>
+      <div class="sub-page-content" id="subPageContent"></div>
+    </div>
+
+    <!-- 编辑主页弹窗 -->
+    <div id="editModal" class="modal-overlay" onclick="closeEditProfile()">
+      <div class="edit-modal" onclick="event.stopPropagation()">
+        <h3 style="margin-bottom:20px;color:#333">编辑资料</h3>
+        <label>昵称</label>
+        <input type="text" id="editName" placeholder="输入昵称" maxlength="20">
+
+        <label>个性签名</label>
+        <input type="text" id="editBio" placeholder="输入个性签名" maxlength="50">
+
+        <div style="display:flex;gap:12px;margin-top:24px">
+          <button class="btn wide" onclick="saveProfile()" style="flex:1">保存</button>
+          <button class="ghost wide" onclick="closeEditProfile()" style="flex:1;background:#f5f5f5;color:#666">取消</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // 安全配置
+    const CONFIG = {
+      MAX_LOGIN_ATTEMPTS: 5,
+      CODE_LENGTH: 6,
+      MAX_NICKNAME_LENGTH: 20,
+      MAX_CONTENT_LENGTH: 500,
+      LOCKOUT_DURATION: 5 * 60 * 1000 // 5分钟
+    };
+
+    // 生成随机验证码
+    function generateCode() {
+      return String(Math.floor(100000 + Math.random() * 900000));
+    }
+
+    // 当前验证码（内存中，页面刷新后重置）
+    let currentCode = '';
+    let loginAttempts = 0;
+    let lockoutTimer = null;
+
+    // XSS 防护：转义 HTML
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // 清理用户输入
+    function sanitizeInput(text, maxLength = 100) {
+      if (!text) return '';
+      return text
+        .replace(/[<>"'&]/g, '')
+        .trim()
+        .substring(0, maxLength);
+    }
+
+    // 验证手机号
+    function isValidPhone(phone) {
+      return /^1[3-9]\d{9}$/.test(phone);
+    }
+
+    // 手机号脱敏
+    function maskPhone(phone) {
+      if (!phone || phone.length !== 11) return phone;
+      return phone.substring(0, 3) + '****' + phone.substring(7);
+    }
+
+    const C = [['全部','🌈'],['暗恋','💕'],['失恋','💔'],['感谢','🙏'],['道歉','😔'],['吐槽','😤'],['其他','💭']];
+    const G = ['#ff6b9d,#ff8fb3','#ff9a9e,#fecfef','#a18cd1,#fbc2eb','#89f7fe,#66a6ff','#ffecd2,#fcb69f','#f6d365,#fda085','#d299c2,#fef9d7'];
+    const D = [
+      {id:1,u:'温柔的小猫',cat:1,t:'今天在图书馆又看见你了，想说的话还是没有说出口。',d:42,l:28,p:156,collectCount:5,c:[['云朵','勇敢一点呀！']],like:0,collected:0,time:'10分钟前'},
+      {id:2,u:'安静的星星',cat:3,t:'谢谢雨天借我伞的人，那天真的被温柔接住了。',d:36,l:42,p:210,collectCount:8,c:[['青鸟','好暖。']],like:1,collected:0,time:'28分钟前'},
+      {id:3,u:'勇敢的海风',cat:5,t:'期末周真的太难了，希望听到这条的人也能撑过去。',d:58,l:19,p:93,collectCount:3,c:[],like:0,collected:0,time:'1小时前'}
+    ];
+
+    let S = JSON.parse(localStorage.tk || 'null') || {user: null, v: D, cat: 0, pcat: 1, cur: 1, play: null, rec: false};
+
+    // 确保数据完整性
+    S.rec = !!S.rec;
+    S.pcat = S.pcat || 1;  // 确保有默认分类
+    S.v = S.v || D;        // 确保有默认数据
+
+    // 为旧数据添加 collected 字段（兼容性处理）
+    S.v.forEach(v => {
+      if (typeof v.collected === 'undefined') {
+        v.collected = false;
+      }
+      if (typeof v.collectCount === 'undefined') {
+        v.collectCount = Math.floor(Math.random() * 10) + 1; // 随机初始收藏数
+      }
+    });
+
+    const $ = x => document.getElementById(x);
+
+    // 保存数据到 localStorage
+    const save = () => {
+      try {
+        localStorage.setItem('tk', JSON.stringify(S));
+      } catch (e) {
+        console.error('Save failed:', e);
+        msg('保存失败，请检查存储空间');
+      }
+    };
+
+    function msg(t) {
+      $('toast').textContent = t;
+      $('toast').classList.add('a');
+      clearTimeout(window.t);
+      window.t = setTimeout(() => $('toast').classList.remove('a'), 1500);
+    }
+
+    function show(id) {
+      document.querySelectorAll('.page').forEach(e => e.classList.remove('on'));
+      $(id).classList.add('on');
+      $('nav').style.display = ['home','post','detail','category','ranking','profile'].includes(id) ? 'flex' : 'none';
+
+      // 页面特定初始化
+      if (id == 'home') home();
+      if (id == 'category') cat();
+      if (id == 'ranking') rank();
+      if (id == 'profile') profile();
+      if (id == 'detail') detail();
+      if (id == 'post') initPost();
+    }
+
+    // 初始化发布页面
+    function initPost() {
+      renderTabs();
+
+      // 确保分类有默认值
+      if (!S.pcat) {
+        S.pcat = 1;
+        save();
+      }
+
+      // 同步录音按钮 UI 状态
+      const recBtn = $('rec');
+      const recText = $('rt');
+
+      if (S.rec) {
+        recBtn.classList.add('a');
+        recText.textContent = '✓ 已生成模拟语音（点击取消）';
+        recText.style.color = '#4CAF50';
+      } else {
+        recBtn.classList.remove('a');
+        recText.textContent = '点击麦克风按钮生成模拟语音';
+        recText.style.color = '#999';
+      }
+    }
+
+    function nav(id) {
+      document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('a', b.dataset.n == id));
+      show(id);
+    }
+
+    function guest() {
+      S.user = {name:'游客小猫',phone:'guest'};
+      save();
+      nav('home');
+    }
+
+    // 发送验证码
+    function sendCode() {
+      const phone = $('phone').value.trim();
+      if (!isValidPhone(phone)) {
+        msg('请输入正确的手机号');
+        return;
+      }
+      // 生成新的随机验证码
+      currentCode = generateCode();
+      msg('验证码：' + currentCode + '（演示模式）');
+    }
+
+    function login() {
+      // 检查登录尝试次数
+      if (loginAttempts >= CONFIG.MAX_LOGIN_ATTEMPTS) {
+        msg('登录尝试次数过多，请5分钟后重试');
+        return;
+      }
+
+      let n = sanitizeInput($('name').value, CONFIG.MAX_NICKNAME_LENGTH) || '温柔的小猫';
+      let p = $('phone').value.trim();
+      let c = $('code').value.trim();
+
+      if (!isValidPhone(p)) {
+        msg('手机号不正确');
+        return;
+      }
+
+      if (c.length !== CONFIG.CODE_LENGTH) {
+        msg('请输入6位验证码');
+        return;
+      }
+
+      // 如果没有生成过验证码，先显示提示
+      if (!currentCode) {
+        msg('请先获取验证码');
+        return;
+      }
+
+      if (c !== currentCode) {
+        loginAttempts++;
+        if (loginAttempts >= CONFIG.MAX_LOGIN_ATTEMPTS) {
+          msg('登录尝试次数过多，请5分钟后重试');
+          // 5分钟后重置
+          lockoutTimer = setTimeout(() => {
+            loginAttempts = 0;
+          }, CONFIG.LOCKOUT_DURATION);
+        } else {
+          msg('验证码错误，还剩' + (CONFIG.MAX_LOGIN_ATTEMPTS - loginAttempts) + '次机会');
+        }
+        return;
+      }
+
+      // 登录成功，重置尝试次数
+      loginAttempts = 0;
+      if (lockoutTimer) {
+        clearTimeout(lockoutTimer);
+        lockoutTimer = null;
+      }
+
+      S.user = {name: n, phone: p};
+      save();
+      msg('登录成功');
+      nav('home');
+    }
+
+    function renderTabs() {
+      // 渲染首页分类标签
+      $('tabs').innerHTML = C.map((x,i) => `<button class="tab ${S.cat==i?'a':''}" onclick="S.cat=${i};save();home()">${escapeHtml(x[1])} ${escapeHtml(x[0])}</button>`).join('');
+
+      // 渲染发布页分类标签（排除"全部"）
+      const pcatTabs = C.slice(1).map((x,i) => {
+        const catId = i + 1;
+        const isActive = S.pcat == catId;
+        return `<button class="tab ${isActive?'a':''}" onclick="S.pcat=${catId};save();renderTabs()">${escapeHtml(x[1])} ${escapeHtml(x[0])}</button>`;
+      }).join('');
+      $('ptabs').innerHTML = pcatTabs;
+    }
+
+    function card(v) {
+      return `<div class="card" onclick="openD(${v.id})">
+        <div class="head">
+          <div class="av">${escapeHtml(v.u[0])}</div>
+          <div class="grow">
+            <div class="name">${escapeHtml(v.u)}</div>
+            <div class="time">${escapeHtml(v.time)}</div>
+          </div>
+          <span class="tag">${escapeHtml(C[v.cat][1])} ${escapeHtml(C[v.cat][0])}</span>
+        </div>
+        <div class="txt">${escapeHtml(v.t)}</div>
+        <div class="player" onclick="event.stopPropagation();play(${v.id})">
+          <button class="play">${S.play==v.id?'⏸':'▶'}</button>
+          <div class="wave ${S.play==v.id?'playing':''}"></div>
+          <span class="time">00:${v.d}</span>
+        </div>
+        <div class="acts">
+          <button class="${v.like?'liked':''}" onclick="event.stopPropagation();like(${v.id})">❤️ ${v.l}</button>
+          <button onclick="event.stopPropagation();openCommentModal(${v.id})">💬 ${v.c.length}</button>
+          <button class="${v.collected?'collected':''}" onclick="event.stopPropagation();collect(${v.id})">⭐ ${v.collectCount||0}</button>
+          <span class="view-count">👁️ ${v.p}</span>
+          <button class="more-btn" onclick="event.stopPropagation();toggleMoreMenu(event,${v.id})">⋯</button>
+        </div>
+      </div>`;
+    }
+
+    function home() {
+      renderTabs();
+      let a = S.v.filter(v => !S.cat || v.cat == S.cat);
+      $('list').innerHTML = a.length ? a.map(card).join('') : '<div class="empty">还没有语音</div>';
+    }
+
+    function play(id) {
+      S.play = S.play == id ? null : id;
+      let v = S.v.find(x => x.id == id);
+      if (S.play && v) v.p++;
+      save();
+      home();
+      if ($('detail').classList.contains('on')) detail();
+    }
+
+    function like(id) {
+      let v = S.v.find(x => x.id == id);
+      v.like = !v.like;
+      v.l += v.like ? 1 : -1;
+      save();
+      home();
+      if ($('detail').classList.contains('on')) detail();
+    }
+
+    // 收藏功能
+    function collect(id) {
+      let v = S.v.find(x => x.id == id);
+      v.collected = !v.collected;
+      // 增减收藏数
+      v.collectCount = (v.collectCount || 0) + (v.collected ? 1 : -1);
+      if (v.collectCount < 0) v.collectCount = 0;
+      save();
+      msg(v.collected ? '已收藏' : '取消收藏');
+      home();
+      if ($('detail').classList.contains('on')) detail();
+    }
+
+    // 当前打开的更多菜单作品ID
+    let currentMoreMenuId = null;
+
+    // 切换更多菜单
+    function toggleMoreMenu(event, id) {
+      event.stopPropagation();
+
+      // 如果点击的是同一个，关闭菜单
+      if (currentMoreMenuId === id) {
+        closeMoreMenu();
+        return;
+      }
+
+      // 关闭之前的菜单
+      closeMoreMenu();
+      currentMoreMenuId = id;
+
+      // 创建菜单
+      const menu = document.createElement('div');
+      menu.id = 'moreMenu' + id;
+      menu.className = 'more-menu show';
+      menu.innerHTML = `
+        <div class="more-menu-item" onclick="event.stopPropagation();shareWork(${id})">
+          📤 分享
+        </div>
+        <div class="more-menu-item" onclick="event.stopPropagation();notInterested(${id})" style="color:#999">
+          🚫 不感兴趣
+        </div>
+      `;
+
+      // 定位到按钮旁边
+      const btn = event.currentTarget;
+      btn.style.position = 'relative';
+      btn.appendChild(menu);
+
+      // 点击其他地方关闭菜单
+      setTimeout(() => {
+        document.addEventListener('click', closeMoreMenuOnClick);
+      }, 0);
+    }
+
+    // 关闭更多菜单
+    function closeMoreMenu() {
+      if (currentMoreMenuId !== null) {
+        const menu = $('moreMenu' + currentMoreMenuId);
+        if (menu) menu.remove();
+        currentMoreMenuId = null;
+      }
+      document.removeEventListener('click', closeMoreMenuOnClick);
+    }
+
+    // 点击其他地方关闭菜单
+    function closeMoreMenuOnClick() {
+      closeMoreMenu();
+    }
+
+    // 分享作品
+    function shareWork(id) {
+      closeMoreMenu();
+      let v = S.v.find(x => x.id == id);
+      // 模拟复制链接
+      msg(`已复制分享链接：作品《${v.t.substring(0, 20)}...》`);
+    }
+
+    // 不感兴趣
+    function notInterested(id) {
+      closeMoreMenu();
+      msg('已减少此类内容推荐');
+    }
+
+    // 评论弹窗相关
+    let currentCommentId = null;
+
+    // 打开评论弹窗
+    function openCommentModal(id) {
+      currentCommentId = id;
+      let v = S.v.find(x => x.id == id);
+      if (!v) return;
+
+      // 创建弹窗
+      const overlay = document.createElement('div');
+      overlay.id = 'commentModal';
+      overlay.className = 'modal-overlay';
+      overlay.onclick = closeCommentModal;
+
+      const commentsHtml = v.c.map(x => `
+        <div class="comment-item">
+          <div class="av" style="background:#ff6b9d">${escapeHtml(x[0][0])}</div>
+          <div class="comment-content">
+            <div class="comment-author">${escapeHtml(x[0])}</div>
+            <div class="comment-text">${escapeHtml(x[1])}</div>
+            <div class="comment-time">刚刚</div>
+          </div>
+        </div>
+      `).join('');
+
+      overlay.innerHTML = `
+        <div class="comment-modal" onclick="event.stopPropagation()">
+          <div class="comment-modal-header">
+            <span class="comment-modal-title">💬 评论 (${v.c.length})</span>
+            <button class="comment-close" onclick="closeCommentModal()">✕</button>
+          </div>
+          <div class="comment-list">
+            ${commentsHtml || '<div class="empty" style="padding:40px 0">暂无评论，快来抢沙发吧~</div>'}
+          </div>
+          <div class="comment-input-area">
+            <input type="text" id="modalCommentInput" class="comment-input" placeholder="写下你的评论..." maxlength="200"
+              onkeypress="if(event.key==='Enter')submitModalComment()">
+            <button class="comment-send" onclick="submitModalComment()">发送</button>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(overlay);
+      setTimeout(() => overlay.classList.add('show'), 10);
+
+      // 自动聚焦输入框
+      setTimeout(() => {
+        const input = $('modalCommentInput');
+        if (input) input.focus();
+      }, 100);
+    }
+
+    // 关闭评论弹窗
+    function closeCommentModal() {
+      const modal = $('commentModal');
+      if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => modal.remove(), 300);
+      }
+      currentCommentId = null;
+    }
+
+    // 提交弹窗评论
+    function submitModalComment() {
+      const input = $('modalCommentInput');
+      if (!input) return;
+
+      const text = sanitizeInput(input.value, 200);
+      if (!text) {
+        msg('请输入评论内容');
+        return;
+      }
+
+      let v = S.v.find(x => x.id == currentCommentId);
+      if (!v) return;
+
+      v.c.unshift([S.user?.name || '游客', text]);
+      save();
+
+      // 刷新弹窗
+      closeCommentModal();
+      openCommentModal(currentCommentId);
+
+      // 刷新首页和详情页
+      home();
+      if ($('detail').classList.contains('on')) detail();
+
+      msg('评论成功');
+    }
+
+    function openD(id) {
+      S.cur = id;
+      save();
+      show('detail');
+    }
+
+    function detail() {
+      let v = S.v.find(x => x.id == S.cur) || S.v[0];
+
+      // 详情页显示评论列表，但评论输入在弹窗中
+      let commentsHtml = v.c.map(x => `<div class="comment">
+        <div class="av">${escapeHtml(x[0][0])}</div>
+        <div class="cbody">
+          <b>${escapeHtml(x[0])}</b>
+          <p>${escapeHtml(x[1])}</p>
+        </div>
+      </div>`).join('');
+
+      $('detailBox').innerHTML = card(v) + `<div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <b>💬 评论 (${v.c.length})</b>
+          <button class="ghost" onclick="openCommentModal(${v.id})" style="font-size:13px;padding:6px 12px">写评论</button>
+        </div>
+        ${commentsHtml || '<div class="empty">暂无评论</div>'}
+      </div>`;
+    }
+
+    // 旧版评论函数（保留兼容性）
+    function comment(id) {
+      openCommentModal(id);
+    }
+
+    function rec() {
+      // 切换录音状态
+      S.rec = !S.rec;
+
+      // 更新 UI
+      const recBtn = $('rec');
+      const recText = $('rt');
+
+      if (S.rec) {
+        recBtn.classList.add('a');
+        recText.textContent = '✓ 已生成模拟语音（点击取消）';
+        recText.style.color = '#4CAF50';
+        recText.style.fontWeight = 'bold';
+        msg('模拟录音已生成，现在可以发布了');
+      } else {
+        recBtn.classList.remove('a');
+        recText.textContent = '点击麦克风按钮生成模拟语音';
+        recText.style.color = '#999';
+        recText.style.fontWeight = 'normal';
+      }
+
+      save();
+    }
+
+    function pub() {
+      // 检查登录状态
+      if (!S.user) {
+        msg('请先登录');
+        setTimeout(() => nav('login'), 1000);
+        return;
+      }
+
+      // 获取并清理内容
+      let t = sanitizeInput($('content').value, CONFIG.MAX_CONTENT_LENGTH);
+      if (!t) {
+        msg('请输入内容');
+        return;
+      }
+
+      // 检查录音状态
+      if (!S.rec) {
+        msg('请先点击麦克风按钮录音');
+        return;
+      }
+
+      // 创建新作品
+      const newPost = {
+        id: Date.now(),
+        u: S.user.name,
+        cat: S.pcat || 1,
+        t: t,
+        d: 30 + Math.floor(Math.random() * 40),
+        l: 0,
+        p: 0,
+        collectCount: 0,
+        c: [],
+        like: 0,
+        collected: 0,
+        time: '刚刚'
+      };
+
+      // 添加到列表
+      S.v.unshift(newPost);
+
+      // 重置表单
+      $('content').value = '';
+      S.rec = false;
+      $('rec').classList.remove('a');
+      $('rt').textContent = '点击模拟录音';
+
+      save();
+      msg('发布成功！');
+
+      // 延迟跳转
+      setTimeout(() => nav('home'), 800);
+    }
+
+    function cat() {
+      $('grid').innerHTML = C.slice(1).map((x,i) => `<div class="cat" style="background:linear-gradient(135deg,${G[i+1]})" onclick="S.cat=${i+1};save();nav('home')">
+        <h1>${escapeHtml(x[1])}</h1>
+        <div>
+          <b>${escapeHtml(x[0])}</b>
+          <p>${S.v.filter(v => v.cat == i+1).length} 条语音</p>
+        </div>
+      </div>`).join('');
+    }
+
+    function randomV() {
+      openD(S.v[Math.floor(Math.random() * S.v.length)].id);
+    }
+
+    function rank() {
+      $('rank').innerHTML = [...S.v].sort((a,b) => (b.l*2+b.c.length*3+b.p*.5)-(a.l*2+a.c.length*3+a.p*.5))
+        .map((v,i) => `<div class="card" onclick="openD(${v.id})">
+          <b style="color:#ff6b9d">#${i+1}</b> ${escapeHtml(v.t.slice(0,24))}
+          <p class="time">${escapeHtml(v.u)} · 🔥 ${Math.round(v.l*2+v.c.length*3+v.p*.5)}</p>
+        </div>`).join('');
+    }
+
+    // 浏览记录管理
+    function addToHistory(id) {
+      if (!S.history) S.history = [];
+      // 移除重复项
+      S.history = S.history.filter(h => h.id !== id);
+      // 添加到开头
+      S.history.unshift({
+        id: id,
+        time: new Date().toISOString()
+      });
+      // 只保留最近50条
+      if (S.history.length > 50) {
+        S.history = S.history.slice(0, 50);
+      }
+      save();
+    }
+
+    // 修改 openD 函数，添加浏览记录
+    const originalOpenD = openD;
+    openD = function(id) {
+      addToHistory(id);
+      S.cur = id;
+      save();
+      show('detail');
+    }
+
+    function profile() {
+      let u = S.user || {name:'未登录',phone:'游客'};
+
+      // 我的作品
+      let myWorks = S.v.filter(v => S.user && v.u == S.user.name);
+      // 我点赞的
+      let myLikes = S.v.filter(v => v.like);
+      // 我收藏的
+      let myCollections = S.v.filter(v => v.collected);
+
+      // 更新头像和昵称
+      $('pav').textContent = u.name[0];
+      $('pname').textContent = escapeHtml(u.name);
+      $('pphone').textContent = u.phone === 'guest' ? '游客' : maskPhone(u.phone);
+
+      // 更新统计数据
+      $('mc').textContent = myWorks.length;
+      $('mLikes').textContent = myLikes.length;
+      $('mCollections').textContent = myCollections.length;
+
+      // 获赞数（作品获得的总点赞数）
+      let totalLikes = myWorks.reduce((s,v) => s+v.l, 0);
+      $('mTotalLikes').textContent = totalLikes;
+
+      // 模拟粉丝数（基于获赞数的随机值）
+      let fansCount = Math.floor(totalLikes * 0.3) + Math.floor(Math.random() * 5);
+      $('mFans').textContent = fansCount;
+    }
+
+    // 子页面管理
+    function showSubPage(pageType) {
+      if (!S.user) {
+        msg('请先登录');
+        return;
+      }
+
+      const titles = {
+        myWorks: '📝 我的作品',
+        myLikes: '❤️ 我点赞的',
+        myCollections: '⭐ 我的收藏',
+        myHistory: '🕐 浏览记录',
+        myFans: '👥 我的粉丝',
+        myStats: '📊 数据中心'
+      };
+
+      $('subPageTitle').textContent = titles[pageType] || '页面';
+      $('subPage').classList.add('show');
+
+      // 渲染内容
+      switch(pageType) {
+        case 'myWorks':
+          renderMyWorks();
+          break;
+        case 'myLikes':
+          renderMyLikes();
+          break;
+        case 'myCollections':
+          renderMyCollections();
+          break;
+        case 'myHistory':
+          renderMyHistory();
+          break;
+        case 'myFans':
+          renderMyFans();
+          break;
+        case 'myStats':
+          renderMyStats();
+          break;
+      }
+    }
+
+    function closeSubPage() {
+      $('subPage').classList.remove('show');
+    }
+
+    // 渲染我的作品
+    function renderMyWorks() {
+      let myWorks = S.v.filter(v => S.user && v.u == S.user.name);
+      if (myWorks.length === 0) {
+        $('subPageContent').innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📝</div>
+            <p>还没有发布过作品</p>
+            <button class="btn" onclick="closeSubPage();nav('post')" style="margin-top:20px">去发布</button>
+          </div>`;
+        return;
+      }
+      $('subPageContent').innerHTML = myWorks.map(v => card(v)).join('');
+    }
+
+    // 渲染我点赞的
+    function renderMyLikes() {
+      let myLikes = S.v.filter(v => v.like);
+      if (myLikes.length === 0) {
+        $('subPageContent').innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">❤️</div>
+            <p>还没有点赞过任何作品</p>
+            <button class="btn" onclick="closeSubPage();nav('home')" style="margin-top:20px">去发现</button>
+          </div>`;
+        return;
+      }
+      $('subPageContent').innerHTML = myLikes.map(v => card(v)).join('');
+    }
+
+    // 渲染我的收藏
+    function renderMyCollections() {
+      let myCollections = S.v.filter(v => v.collected);
+      if (myCollections.length === 0) {
+        $('subPageContent').innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">⭐</div>
+            <p>还没有收藏任何作品</p>
+            <button class="btn" onclick="closeSubPage();nav('home')" style="margin-top:20px">去发现</button>
+          </div>`;
+        return;
+      }
+      $('subPageContent').innerHTML = myCollections.map(v => card(v)).join('');
+    }
+
+    // 渲染浏览记录
+    function renderMyHistory() {
+      if (!S.history || S.history.length === 0) {
+        $('subPageContent').innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">🕐</div>
+            <p>还没有浏览记录</p>
+            <button class="btn" onclick="closeSubPage();nav('home')" style="margin-top:20px">去发现</button>
+          </div>`;
+        return;
+      }
+
+      // 根据历史记录ID获取作品
+      let historyWorks = S.history
+        .map(h => S.v.find(v => v.id == h.id))
+        .filter(v => v); // 过滤掉可能已删除的作品
+
+      if (historyWorks.length === 0) {
+        $('subPageContent').innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">🕐</div>
+            <p>浏览记录为空</p>
+          </div>`;
+        return;
+      }
+
+      $('subPageContent').innerHTML = historyWorks.map(v => card(v)).join('');
+    }
+
+    // 渲染粉丝列表（模拟数据）
+    function renderMyFans() {
+      let myWorks = S.v.filter(v => S.user && v.u == S.user.name);
+      let totalLikes = myWorks.reduce((s,v) => s+v.l, 0);
+      let fansCount = Math.floor(totalLikes * 0.3) + Math.floor(Math.random() * 5);
+
+      if (fansCount === 0) {
+        $('subPageContent').innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">👥</div>
+            <p>还没有粉丝</p>
+            <p class="sub" style="margin-top:8px">多发布优质内容吸引更多关注吧~</p>
+          </div>`;
+        return;
+      }
+
+      // 生成模拟粉丝列表
+      const fanNames = ['温柔的小猫', '安静的海风', '快乐的小鸟', '神秘的用户', '可爱的兔子', '勇敢的狮子'];
+      let fansHtml = '';
+      for (let i = 0; i < Math.min(fansCount, 20); i++) {
+        let name = fanNames[i % fanNames.length] + (i >= fanNames.length ? i : '');
+        let isFollowing = Math.random() > 0.5;
+        fansHtml += `
+          <div class="fan-item">
+            <div class="fan-avatar">${name[0]}</div>
+            <div class="fan-info">
+              <div class="fan-name">${escapeHtml(name)}</div>
+              <div class="fan-id">用户#${Math.floor(Math.random() * 90000 + 10000)}</div>
+            </div>
+            <button class="fan-btn ${isFollowing ? 'following' : ''}" onclick="toggleFollow(this)">${isFollowing ? '已关注' : '关注'}</button>
+          </div>`;
+      }
+
+      $('subPageContent').innerHTML = fansHtml;
+    }
+
+    // 切换关注状态
+    function toggleFollow(btn) {
+      if (btn.classList.contains('following')) {
+        btn.classList.remove('following');
+        btn.textContent = '关注';
+      } else {
+        btn.classList.add('following');
+        btn.textContent = '已关注';
+      }
+    }
+
+    // 渲染数据中心
+    function renderMyStats() {
+      let myWorks = S.v.filter(v => S.user && v.u == S.user.name);
+      let totalLikes = myWorks.reduce((s,v) => s+v.l, 0);
+      let totalPlays = myWorks.reduce((s,v) => s+v.p, 0);
+      let totalComments = myWorks.reduce((s,v) => s+v.c.length, 0);
+
+      $('subPageContent').innerHTML = `
+        <div class="card" style="text-align:center;padding:30px">
+          <h3 style="color:#ff6b9d;margin-bottom:24px">📊 数据统计</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+            <div style="background:#FFE4EC;padding:20px;border-radius:16px">
+              <div style="font-size:32px;font-weight:bold;color:#ff6b9d">${myWorks.length}</div>
+              <div style="color:#666;margin-top:8px">发布作品</div>
+            </div>
+            <div style="background:#FFF4E4;padding:20px;border-radius:16px">
+              <div style="font-size:32px;font-weight:bold;color:#ff6b9d">${totalLikes}</div>
+              <div style="color:#666;margin-top:8px">获得点赞</div>
+            </div>
+            <div style="background:#E4F8FF;padding:20px;border-radius:16px">
+              <div style="font-size:32px;font-weight:bold;color:#ff6b9d">${totalPlays}</div>
+              <div style="color:#666;margin-top:8px">总播放量</div>
+            </div>
+            <div style="background:#F0E4FF;padding:20px;border-radius:16px">
+              <div style="font-size:32px;font-weight:bold;color:#ff6b9d">${totalComments}</div>
+              <div style="color:#666;margin-top:8px">收到评论</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h4 style="margin-bottom:16px;color:#333">🏆 最受欢迎的作品</h4>
+          ${myWorks.length > 0 ?
+            [...myWorks].sort((a,b) => b.l - a.l).slice(0,3).map(v => `
+              <div style="padding:12px 0;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center">
+                <span>${escapeHtml(v.t.substring(0,30))}...</span>
+                <span style="color:#ff6b9d;font-weight:bold">❤️ ${v.l}</span>
+              </div>
+            `).join('') :
+            '<p class="sub">还没有发布作品</p>'
+          }
+        </div>
+      `;
+    }
+
+    // 编辑主页功能
+    function openEditProfile() {
+      if (!S.user) {
+        msg('请先登录');
+        return;
+      }
+      $('editName').value = S.user.name || '';
+      $('editBio').value = S.user.bio || '';
+      $('editModal').classList.add('show');
+    }
+
+    function closeEditProfile() {
+      $('editModal').classList.remove('show');
+    }
+
+    function saveProfile() {
+      let name = sanitizeInput($('editName').value, 20);
+      let bio = sanitizeInput($('editBio').value, 50);
+
+      if (!name) {
+        msg('昵称不能为空');
+        return;
+      }
+
+      S.user.name = name;
+      S.user.bio = bio;
+      save();
+
+      closeEditProfile();
+      profile();
+      msg('资料已更新');
+    }
+
+    function changeAvatar() {
+      msg('头像更换功能开发中');
+    }
+
+    function reset() {
+      localStorage.removeItem('tk');
+      // 重置所有状态
+      S = {user: null, v: D, cat: 0, pcat: 1, cur: 1, play: null, rec: false};
+      currentCode = '';
+      loginAttempts = 0;
+      if (lockoutTimer) clearTimeout(lockoutTimer);
+      msg('已重置');
+      setTimeout(() => location.reload(), 500);
+    }
+
+    renderTabs();
+  </script>
+</body>
+</html>

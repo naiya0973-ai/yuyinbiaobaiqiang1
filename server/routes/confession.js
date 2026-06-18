@@ -1,10 +1,34 @@
 const express = require('express');
 const { body, param, query, validationResult } = require('express-validator');
+const rateLimit = require('express-rate-limit');
 const { supabaseAdmin } = require('../config/supabase');
 const { authenticate, optionalAuth } = require('../middleware/auth');
-const { paginate, hashIp, containsSensitiveContent } = require('../utils/helpers');
+const { paginate, hashIp, containsSensitiveContent, sanitizeInput } = require('../utils/helpers');
 
 const router = express.Router();
+
+// 创建内容的速率限制
+const createConfessionLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1小时
+  max: 20, // 每小时最多20个表白
+  message: {
+    code: 429,
+    message: '发布内容过于频繁，请稍后再试'
+  },
+  // 基于用户ID限流而不是IP
+  keyGenerator: (req) => req.user?.id || req.ip
+});
+
+// 点赞操作的速率限制
+const likeLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1分钟
+  max: 30, // 每分钟最多30次点赞
+  message: {
+    code: 429,
+    message: '操作过于频繁，请稍后再试'
+  },
+  keyGenerator: (req) => req.user?.id || req.ip
+});
 
 function ok(res, data = null, message = '操作成功') {
   return res.json({ code: 0, data, message });
@@ -39,7 +63,6 @@ function normalizeConfession(item) {
     playCount: item.play_count,
     reportedCount: item.reported_count,
     createdAt: item.created_at,
-    userId: item.user_id,
     nickname: profile.nickname || '',
     avatarUrl: profile.avatar_url || '',
     categoryId: item.category_id,
@@ -176,9 +199,9 @@ router.get('/:id', optionalAuth, [
   }
 });
 
-router.post('/', authenticate, [
+router.post('/', authenticate, createConfessionLimiter, [
   body('categoryId').isInt({ min: 1 }).withMessage('请选择有效的分类'),
-  body('audioUrl').isURL().withMessage('请上传音频文件'),
+  body('audioUrl').optional({ values: 'falsy' }).isURL().withMessage('请上传有效的音频文件'),
   body('title').optional().isLength({ max: 100 }).withMessage('标题最多100个字符'),
   body('content').optional().isLength({ max: 500 }).withMessage('内容最多500个字符'),
   body('audioDuration').optional().isInt({ min: 0 }).withMessage('音频时长无效'),
@@ -187,9 +210,15 @@ router.post('/', authenticate, [
   try {
     if (!validate(req, res)) return;
 
-    const { categoryId, title, content, audioUrl, audioDuration, audioSize } = req.body;
+    const { categoryId, audioUrl, audioDuration, audioSize } = req.body;
+    const title = sanitizeInput(req.body.title || '');
+    const content = sanitizeInput(req.body.content || '');
     if (containsSensitiveContent(title) || containsSensitiveContent(content)) {
       return fail(res, 400, '内容包含敏感词，请修改后再发布');
+    }
+
+    if (!audioUrl && !content) {
+      return fail(res, 400, '请填写文字内容或上传语音');
     }
 
     const { data, error } = await supabaseAdmin
@@ -199,9 +228,9 @@ router.post('/', authenticate, [
         category_id: Number(categoryId),
         title: title || null,
         content: content || null,
-        audio_url: audioUrl,
-        audio_duration: Number(audioDuration || 0),
-        audio_size: Number(audioSize || 0)
+        audio_url: audioUrl || null,
+        audio_duration: audioUrl ? Number(audioDuration || 0) : null,
+        audio_size: audioUrl ? Number(audioSize || 0) : null
       })
       .select('id')
       .single();
@@ -244,7 +273,7 @@ router.delete('/:id', authenticate, [
   }
 });
 
-router.post('/:id/like', authenticate, [
+router.post('/:id/like', authenticate, likeLimiter, [
   param('id').isInt({ min: 1 })
 ], async (req, res) => {
   try {

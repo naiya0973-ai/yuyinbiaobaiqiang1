@@ -20,7 +20,13 @@ const allowedOrigins = [
 ].filter(Boolean);
 
 app.use(cors({
-  origin: allowedOrigins.length > 0 ? allowedOrigins : '*',
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+      callback(null, true);
+    } else {
+      callback(new Error('不允许的来源'));
+    }
+  },
   credentials: true
 }));
 
@@ -60,6 +66,26 @@ const reportLimiter = rateLimit({
   message: {
     code: 429,
     message: '举报提交过于频繁，请稍后再试'
+  }
+});
+
+// 创建内容的速率限制（防止垃圾内容）
+const createContentLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1小时
+  max: 30, // 每小时最多创建30个内容
+  message: {
+    code: 429,
+    message: '发布内容过于频繁，请稍后再试'
+  }
+});
+
+// 点赞操作的速率限制
+const likeLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1分钟
+  max: 60, // 每分钟最多60次点赞
+  message: {
+    code: 429,
+    message: '操作过于频繁，请稍后再试'
   }
 });
 
@@ -116,9 +142,10 @@ app.use((err, req, res, next) => {
     });
   }
 
+  const isProduction = process.env.NODE_ENV === 'production';
   res.status(err.status || 500).json({
     code: err.status || 500,
-    message: err.message || '服务器内部错误'
+    message: isProduction ? '服务器内部错误' : (err.message || '服务器内部错误')
   });
 });
 

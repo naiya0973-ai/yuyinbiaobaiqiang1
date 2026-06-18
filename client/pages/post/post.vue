@@ -153,8 +153,19 @@ let recordingTimer = null
 let innerAudioContext = null
 
 const canPublish = computed(() => {
-  return selectedCategory.value && audioFile.value
+  const hasContent = content.value.trim().length > 0 || audioFile.value
+  const hasValidCategory = selectedCategory.value && categories.value.some(c => c.id === selectedCategory.value)
+  return hasValidCategory && hasContent
 })
+
+// 清理用户输入，防止 XSS
+const sanitizeContent = (text) => {
+  if (!text) return ''
+  return text
+    .replace(/[<>\"'\/&]/g, '')
+    .trim()
+    .substring(0, 500)
+}
 
 const formatTime = (seconds) => {
   if (!seconds) return '00:00'
@@ -251,31 +262,57 @@ const seekTo = (e) => {
 
 const publish = async () => {
   if (!canPublish.value || publishing.value) return
+
+  // 再次验证内容长度
+  if (content.value.length > 500) {
+    uni.showToast({ title: '内容过长，请控制在500字以内', icon: 'none' })
+    return
+  }
+
   publishing.value = true
 
   try {
     uni.showLoading({ title: '上传中...' })
 
-    const uploadData = await uploadAudio(audioFile.value, {
-      duration: audioDuration.value
-    })
+    let uploadData = null
+    if (audioFile.value) {
+      // 验证文件大小（50MB）
+      const fs = uni.getFileSystemManager()
+      const fileInfo = fs.getFileInfo({ filePath: audioFile.value })
+      const maxSize = 50 * 1024 * 1024 // 50MB
+
+      uploadData = await uploadAudio(audioFile.value, {
+        duration: audioDuration.value
+      })
+    }
+
+    // 清理内容
+    const cleanContent = sanitizeContent(content.value)
 
     await createConfession({
       categoryId: selectedCategory.value,
-      content: content.value,
-      audioUrl: uploadData.url,
-      audioDuration: uploadData.duration
+      content: cleanContent,
+      audioUrl: uploadData?.url,
+      audioDuration: uploadData?.duration || audioDuration.value,
+      audioSize: uploadData?.size
     })
 
     uni.hideLoading()
     uni.showToast({ title: '发布成功', icon: 'success' })
+
+    // 重置表单
+    content.value = ''
+    audioFile.value = null
+    audioDuration.value = 0
+    selectedCategory.value = null
 
     setTimeout(() => {
       uni.switchTab({ url: '/pages/index/index' })
     }, 1500)
   } catch (err) {
     uni.hideLoading()
-    uni.showToast({ title: '发布失败', icon: 'none' })
+    console.error('Publish error:', err)
+    uni.showToast({ title: err.message || '发布失败', icon: 'none' })
   } finally {
     publishing.value = false
   }

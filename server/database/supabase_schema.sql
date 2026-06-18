@@ -109,6 +109,14 @@ create table if not exists public.sms_codes (
   created_at timestamptz not null default now()
 );
 
+-- 上传文件记录表（替代内存中的 uploadOwnership）
+create table if not exists public.uploaded_files (
+  id bigserial primary key,
+  user_id uuid not null references public.profiles(id) on delete cascade,
+  filename text not null,
+  created_at timestamptz not null default now()
+);
+
 create index if not exists idx_profiles_phone on public.profiles(phone);
 create index if not exists idx_profiles_anonymous_id on public.profiles(anonymous_id);
 create index if not exists idx_profiles_status on public.profiles(status);
@@ -131,6 +139,8 @@ create index if not exists idx_reports_status on public.reports(status);
 create index if not exists idx_play_history_confession_id on public.play_history(confession_id);
 create index if not exists idx_sms_codes_phone on public.sms_codes(phone);
 create index if not exists idx_sms_codes_expired_at on public.sms_codes(expired_at);
+create index if not exists idx_uploaded_files_user_id on public.uploaded_files(user_id);
+create index if not exists idx_uploaded_files_filename on public.uploaded_files(filename);
 
 create or replace function public.set_updated_at()
 returns trigger as $$
@@ -163,6 +173,7 @@ alter table public.likes enable row level security;
 alter table public.reports enable row level security;
 alter table public.play_history enable row level security;
 alter table public.sms_codes enable row level security;
+alter table public.uploaded_files enable row level security;
 
 drop policy if exists "Public categories are readable" on public.categories;
 create policy "Public categories are readable"

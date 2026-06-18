@@ -37,7 +37,6 @@ function normalizeConfession(item) {
     commentCount: item.comment_count,
     playCount: item.play_count,
     createdAt: item.created_at,
-    userId: item.user_id,
     nickname: profile.nickname || '',
     avatarUrl: profile.avatar_url || '',
     categoryName: category.name || '',

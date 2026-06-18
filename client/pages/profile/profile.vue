@@ -12,15 +12,15 @@
     <view class="user-card">
       <view class="avatar-section">
         <view class="avatar" :style="{ background: avatarColor }">
-          <text>{{ userInfo.nickname ? userInfo.nickname[0] : '?' }}</text>
+          <text>{{ displayInitial }}</text>
         </view>
         <view class="edit-avatar" @click="editAvatar">
           <text>📷</text>
         </view>
       </view>
 
-      <text class="nickname">{{ userInfo.nickname || '未登录' }}</text>
-      <text class="user-id">{{ userInfo.anonymousId || '' }}</text>
+      <text class="nickname">{{ displayNickname }}</text>
+      <text class="user-id">{{ displayAnonymousId }}</text>
 
       <!-- 统计数据 -->
       <view class="stats-row">
@@ -142,8 +142,28 @@ const userStore = useUserStore()
 const isLoggedIn = computed(() => userStore.isLoggedIn)
 const userInfo = computed(() => userStore.userInfo || {})
 
+// 安全显示计算属性
+const displayNickname = computed(() => {
+  const nickname = userInfo.value?.nickname
+  if (!nickname) return '未登录'
+  // 限制长度并清理
+  return String(nickname).substring(0, 20)
+})
+
+const displayInitial = computed(() => {
+  const nickname = userInfo.value?.nickname
+  if (!nickname) return '?'
+  // 安全获取首字符
+  const str = String(nickname).trim()
+  return str.charAt(0) || '?'
+})
+
+const displayAnonymousId = computed(() => {
+  return userInfo.value?.anonymousId || ''
+})
+
 const avatarColor = ref('#FF6B9D')
-const unreadCount = ref(3)
+const unreadCount = ref(0)  // 初始化为0而不是硬编码3
 
 const stats = ref({
   voiceCount: 0,

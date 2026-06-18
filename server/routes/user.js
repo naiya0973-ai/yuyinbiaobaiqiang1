@@ -2,7 +2,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const { supabaseAdmin } = require('../config/supabase');
 const { authenticate } = require('../middleware/auth');
-const { paginate } = require('../utils/helpers');
+const { paginate, sanitizeInput } = require('../utils/helpers');
 
 const router = express.Router();
 
@@ -81,14 +81,21 @@ router.get('/profile', authenticate, async (req, res) => {
 
 router.put('/profile', authenticate, [
   body('nickname').optional().isLength({ min: 1, max: 50 }).withMessage('昵称长度应在1-50个字符之间'),
-  body('avatarUrl').optional().isURL().withMessage('头像地址格式不正确')
+  body('avatarUrl').optional().isURL({ protocols: ['http', 'https'], require_protocol: true }).withMessage('头像地址必须是有效的 HTTP/HTTPS URL')
 ], async (req, res) => {
   try {
     if (!validate(req, res)) return;
 
     const updates = {};
-    if (req.body.nickname) updates.nickname = req.body.nickname.trim();
-    if (req.body.avatarUrl) updates.avatar_url = req.body.avatarUrl;
+    if (req.body.nickname) updates.nickname = sanitizeInput(req.body.nickname);
+    if (req.body.avatarUrl) {
+      // 额外验证 URL 不以 javascript: 或 data: 开头（防止 XSS）
+      const url = req.body.avatarUrl.toLowerCase().trim();
+      if (url.startsWith('javascript:') || url.startsWith('data:') || url.startsWith('vbscript:')) {
+        return fail(res, 400, '头像地址包含不安全的协议');
+      }
+      updates.avatar_url = req.body.avatarUrl;
+    }
 
     if (Object.keys(updates).length === 0) {
       return fail(res, 400, '没有要更新的内容');

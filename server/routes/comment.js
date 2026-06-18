@@ -1,10 +1,23 @@
 const express = require('express');
 const { body, param, query, validationResult } = require('express-validator');
+const rateLimit = require('express-rate-limit');
 const { supabaseAdmin } = require('../config/supabase');
 const { authenticate } = require('../middleware/auth');
-const { paginate, containsSensitiveContent } = require('../utils/helpers');
+const { paginate, containsSensitiveContent, sanitizeInput } = require('../utils/helpers');
 
 const router = express.Router();
+
+// 创建评论的速率限制
+const createCommentLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1小时
+  max: 50, // 每小时最多50条评论
+  message: {
+    code: 429,
+    message: '评论过于频繁，请稍后再试'
+  },
+  // 基于用户ID限流
+  keyGenerator: (req) => req.user?.id || req.ip
+});
 
 function ok(res, data = null, message = '操作成功') {
   return res.json({ code: 0, data, message });
@@ -88,14 +101,18 @@ router.get('/:confessionId', [
   }
 });
 
-router.post('/', authenticate, [
+router.post('/', authenticate, createCommentLimiter, [
   body('confessionId').isInt({ min: 1 }).withMessage('无效的表白ID'),
   body('content').isLength({ min: 1, max: 500 }).withMessage('评论内容应在1-500个字符之间')
 ], async (req, res) => {
   try {
     if (!validate(req, res)) return;
 
-    const { confessionId, content } = req.body;
+    const { confessionId } = req.body;
+    const content = sanitizeInput(req.body.content || '');
+    if (!content) {
+      return fail(res, 400, '评论内容不能为空');
+    }
     if (containsSensitiveContent(content)) {
       return fail(res, 400, '评论包含敏感词，请修改后再提交');
     }
@@ -110,7 +127,7 @@ router.post('/', authenticate, [
       .insert({
         confession_id: Number(confessionId),
         user_id: req.user.id,
-        content: content.trim()
+        content
       })
       .select('id, confession_id, user_id, content, created_at, profiles(nickname, avatar_url)')
       .single();

@@ -83,10 +83,26 @@ function calculateHotScore(likeCount, commentCount, playCount) {
   return Math.round(likeCount * 2 + commentCount * 3 + playCount * 0.5);
 }
 
-const defaultSensitiveWords = ['赌博', '毒品', '恐怖主义', '自杀教程', '诈骗链接'];
+const defaultSensitiveWords = (process.env.SENSITIVE_WORDS || '赌博,毒品,恐怖主义,自杀教程,诈骗链接,枪支弹药,色情交易,赌博网站,代孕,裸聊,刷单,杀猪盘,钓鱼链接,非法集资,传销,邪教,暴力血腥,儿童色情,贩卖毒品,管制刀具')
+  .split(',')
+  .map((w) => w.trim())
+  .filter(Boolean);
+
 function containsSensitiveContent(text = '') {
   if (!text) return false;
-  return defaultSensitiveWords.some((word) => text.includes(word));
+  const normalized = text.toLowerCase();
+  return defaultSensitiveWords.some((word) => normalized.includes(word));
+}
+
+function sanitizeInput(text = '') {
+  if (!text) return '';
+  return text
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .replace(/\//g, '&#x2F;')
+    .trim();
 }
 
 module.exports = {
@@ -100,5 +116,6 @@ module.exports = {
   formatFileSize,
   formatDuration,
   calculateHotScore,
-  containsSensitiveContent
+  containsSensitiveContent,
+  sanitizeInput
 };

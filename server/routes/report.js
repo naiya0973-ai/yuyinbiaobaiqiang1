@@ -2,6 +2,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const { supabaseAdmin } = require('../config/supabase');
 const { authenticate } = require('../middleware/auth');
+const { sanitizeInput } = require('../utils/helpers');
 
 const router = express.Router();
 
@@ -44,7 +45,8 @@ router.post('/', authenticate, [
     if (!validate(req, res)) return;
 
     const reporterId = req.user.id;
-    const { targetType, targetId, reason, description } = req.body;
+    const { targetType, targetId, reason } = req.body;
+    const description = sanitizeInput(req.body.description || '');
     const numericTargetId = Number(targetId);
     const target = await getTarget(targetType, numericTargetId);
 
