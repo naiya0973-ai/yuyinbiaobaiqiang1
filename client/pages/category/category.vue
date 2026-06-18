@@ -33,7 +33,8 @@
 </template>
 
 <script setup>
-import { ref, onShow } from 'vue'
+import { ref } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import { getCategories } from '@/api/ranking.js'
 import { getConfessionList } from '@/api/confession.js'
 

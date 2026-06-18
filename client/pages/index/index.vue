@@ -144,7 +144,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { useUserStore } from '@/store/index.js'
-import { getConfessionList, toggleLike } from '@/api/confession.js'
+import { getConfessionList, toggleLike as toggleLikeApi } from '@/api/confession.js'
 import { getCategories } from '@/api/ranking.js'
 
 const userStore = useUserStore()
@@ -279,7 +279,7 @@ const togglePlay = (item) => {
 const toggleLike = async (item) => {
   if (!userStore.checkLogin()) return
   try {
-    const data = await toggleLike(item.id)
+    const data = await toggleLikeApi(item.id)
     item.isLiked = data.isLiked
     item.likeCount = data.likeCount
   } catch (err) {

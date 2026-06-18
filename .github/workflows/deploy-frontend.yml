@@ -42,6 +42,8 @@ jobs:
           npm run build:h5
         env:
           NODE_ENV: production
+          GITHUB_PAGES: 'true'
+          VUE_APP_API_URL: ${{ vars.VUE_APP_API_URL }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
