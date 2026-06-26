@@ -6,14 +6,19 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 concurrency:
-  group: "pages"
+  group: pages
   cancel-in-progress: true
 
 jobs:
   deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -23,18 +28,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'npm'
+          cache: npm
           cache-dependency-path: client/package-lock.json
 
       - name: Install dependencies
-        run: |
-          cd client
-          npm ci
+        run: npm ci
+        working-directory: client
 
       - name: Build H5
-        run: |
-          cd client
-          npm run build:h5
+        run: npm run build:h5
+        working-directory: client
         env:
           UNI_INPUT_DIR: .
           NODE_ENV: production
@@ -44,12 +47,10 @@ jobs:
       - name: Write runtime API config for GitHub Pages
         run: |
           API_URL="${{ vars.VUE_APP_API_URL }}"
-          INDEX_FILE="client/dist/build/h5/index.html"
           if [ -z "$API_URL" ]; then
-            echo "Warning: VUE_APP_API_URL not set. Configure repo Variable after Vercel API deploy."
-            API_URL=""
+            API_URL="https://voice-confession-wall-api.onrender.com/api"
           fi
-          sed -i "s|__API_URL_PLACEHOLDER__|${API_URL}|g" "$INDEX_FILE"
+          sed -i "s|__API_URL_PLACEHOLDER__|${API_URL}|g" client/dist/build/h5/index.html
 
       - name: Verify build output
         run: test -f client/dist/build/h5/index.html
@@ -57,9 +58,14 @@ jobs:
       - name: Prepare GitHub Pages
         run: touch client/dist/build/h5/.nojekyll
 
-      - name: Deploy to gh-pages branch
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: client/dist/build/h5
-          publish_branch: gh-pages
+          path: client/dist/build/h5
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
