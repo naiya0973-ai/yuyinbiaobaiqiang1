@@ -2,10 +2,7 @@ name: Deploy Frontend to GitHub Pages
 
 on:
   push:
-    branches: [ main ]
-    paths:
-      - 'client/**'
-      - '.github/workflows/**'
+    branches: [main]
   workflow_dispatch:
 
 permissions:
