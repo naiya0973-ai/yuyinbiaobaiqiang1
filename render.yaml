@@ -6,6 +6,7 @@ services:
     name: voice-confession-wall-api
     runtime: node
     plan: free
+    region: singapore
     rootDir: server
     buildCommand: npm install
     startCommand: npm start
@@ -16,16 +17,20 @@ services:
         value: production
       - key: PORT
         value: 10000
+      - key: USE_SUPABASE_STORAGE
+        value: "true"
+      - key: SUPABASE_URL
+        value: https://qgsuabymkaglivexzpjo.supabase.co
+      - key: SUPABASE_STORAGE_AUDIO_BUCKET
+        value: audios
       - key: JWT_SECRET
         generateValue: true
-      - key: SUPABASE_URL
-        sync: false
       - key: SUPABASE_ANON_KEY
         sync: false
       - key: SUPABASE_SERVICE_ROLE_KEY
         sync: false
       - key: BASE_URL
-        sync: false
+        value: https://voice-confession-wall-api.onrender.com
       - key: CLIENT_ORIGIN
         value: https://naiya0973-ai.github.io
       - key: ADMIN_ORIGIN

@@ -6,6 +6,7 @@
   "scripts": {
     "install:all": "npm ci && cd client && npm ci && cd ../server && npm ci",
     "build:vercel": "cd client && cross-env UNI_INPUT_DIR=. VUE_APP_API_URL=/api npm run build:h5",
+    "deploy:render": "node scripts/deploy-to-render.mjs",
     "dev:client": "cd client && npm run dev:h5",
     "dev:server": "cd server && npm run dev"
   },
