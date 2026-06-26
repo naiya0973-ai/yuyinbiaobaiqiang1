@@ -4,7 +4,7 @@ const { supabaseAdmin } = require('../config/supabase');
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES = process.env.JWT_EXPIRES || '7d';
 
-if (!JWT_SECRET) {
+if (!JWT_SECRET && !process.env.VERCEL) {
   console.error('FATAL: JWT_SECRET environment variable is required');
   process.exit(1);
 }

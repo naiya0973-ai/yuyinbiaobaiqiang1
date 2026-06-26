@@ -1,0 +1,35 @@
+{
+  "name": "voice-confession-wall",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Voice Confession Wall - full stack deployment",
+  "scripts": {
+    "install:all": "npm ci && cd client && npm ci && cd ../server && npm ci",
+    "build:vercel": "cd client && cross-env UNI_INPUT_DIR=. VUE_APP_API_URL=/api npm run build:h5",
+    "dev:client": "cd client && npm run dev:h5",
+    "dev:server": "cd server && npm run dev"
+  },
+  "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "@supabase/supabase-js": "^2.45.4",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "cos-nodejs-sdk-v5": "^2.12.6",
+    "dayjs": "^1.11.10",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "express-validator": "^7.0.1",
+    "fluent-ffmpeg": "^2.1.2",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.6.5",
+    "redis": "^4.6.11",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "vercel": "^54.17.3"
+  }
+}

@@ -44,6 +44,16 @@ jobs:
           GITHUB_PAGES: 'true'
           VUE_APP_API_URL: ${{ vars.VUE_APP_API_URL || 'https://voice-confession-wall-api.onrender.com/api' }}
 
+      - name: Write runtime API config for GitHub Pages
+        run: |
+          API_URL="${{ vars.VUE_APP_API_URL }}"
+          INDEX_FILE="client/dist/build/h5/index.html"
+          if [ -z "$API_URL" ]; then
+            echo "Warning: VUE_APP_API_URL not set. Configure repo Variable after Vercel API deploy."
+            API_URL=""
+          fi
+          sed -i "s|__API_URL_PLACEHOLDER__|${API_URL}|g" "$INDEX_FILE"
+
       - name: Verify build output
         run: test -f client/dist/build/h5/index.html
 

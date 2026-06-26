@@ -1,0 +1,8 @@
+.github
+docs
+admin
+client/node_modules
+server/node_modules
+server/uploads
+*.md
+!README.md

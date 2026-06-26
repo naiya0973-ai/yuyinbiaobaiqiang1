@@ -1,9 +1,5 @@
 const { createClient } = require('@supabase/supabase-js');
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
 const clientOptions = {
   auth: {
     persistSession: false,
@@ -11,7 +7,12 @@ const clientOptions = {
   }
 };
 
+let supabaseAdminInstance = null;
+let supabaseClientInstance = null;
+
 function createSupabaseInstance(keyName, keyValue) {
+  const supabaseUrl = process.env.SUPABASE_URL;
+
   if (!supabaseUrl) {
     throw new Error('SUPABASE_URL is required');
   }
@@ -23,10 +24,31 @@ function createSupabaseInstance(keyName, keyValue) {
   return createClient(supabaseUrl, keyValue, clientOptions);
 }
 
-const supabaseAdmin = createSupabaseInstance('SUPABASE_SERVICE_ROLE_KEY', supabaseServiceRoleKey);
-const supabaseClient = createSupabaseInstance('SUPABASE_ANON_KEY', supabaseAnonKey);
+function getSupabaseAdmin() {
+  if (!supabaseAdminInstance) {
+    supabaseAdminInstance = createSupabaseInstance(
+      'SUPABASE_SERVICE_ROLE_KEY',
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+  }
+  return supabaseAdminInstance;
+}
+
+function getSupabaseClient() {
+  if (!supabaseClientInstance) {
+    supabaseClientInstance = createSupabaseInstance(
+      'SUPABASE_ANON_KEY',
+      process.env.SUPABASE_ANON_KEY
+    );
+  }
+  return supabaseClientInstance;
+}
 
 module.exports = {
-  supabaseAdmin,
-  supabaseClient
+  get supabaseAdmin() {
+    return getSupabaseAdmin();
+  },
+  get supabaseClient() {
+    return getSupabaseClient();
+  }
 };

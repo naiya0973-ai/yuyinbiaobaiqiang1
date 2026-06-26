@@ -1,6 +1,34 @@
 # 完整功能部署指南
 
-要实现登录、发布语音、点赞评论等完整功能，需要部署 **前端 + 后端 + 数据库** 三部分。
+要实现登录、发布语音、点赞评论等完整功能，需要部署 **前端 + 后端 + 数据库**。
+
+## 推荐：一键部署到 Vercel（前端 + API 同域）
+
+项目已配置 `vercel.json`，可将 **uni-app H5 前端** 与 **Express API** 部署到同一 Vercel 项目，API 地址为 `/api`，无需单独配置 CORS。
+
+### 步骤
+
+1. **配置 Supabase**（见下方「第一步」）
+2. 访问 [vercel.com](https://vercel.com)，用 GitHub 登录
+3. **Add New Project** → 导入仓库 `naiya0973-ai/yuyinbiaobaiqiang1`
+4. 在 **Environment Variables** 中添加（参考 `.env.vercel.example`）：
+   - `JWT_SECRET`、`SUPABASE_URL`、`SUPABASE_ANON_KEY`、`SUPABASE_SERVICE_ROLE_KEY`
+   - `DEMO_SMS_CODE=123456`（演示登录）
+5. 点击 **Deploy**
+
+### 本地 CLI 部署
+
+```bash
+npm i -g vercel
+vercel login
+vercel --prod
+```
+
+部署完成后访问 Vercel 提供的域名，登录验证码使用 `123456`。
+
+---
+
+## 备选：GitHub Pages + Render 分离部署
 
 ## 架构
 

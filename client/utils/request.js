@@ -1,6 +1,26 @@
 // API request utility
-// 使用环境变量或根据当前环境动态设置
-const BASE_URL = process.env.VUE_APP_API_URL || process.env.API_BASE_URL || 'http://localhost:3000/api'
+function resolveBaseUrl() {
+  if (typeof window !== 'undefined' && window.__RUNTIME_CONFIG__?.apiUrl) {
+    const runtimeUrl = String(window.__RUNTIME_CONFIG__.apiUrl).trim()
+    if (runtimeUrl && runtimeUrl !== '__API_URL_PLACEHOLDER__') {
+      return runtimeUrl.replace(/\/$/, '')
+    }
+  }
+  return process.env.VUE_APP_API_URL || process.env.API_BASE_URL || 'http://localhost:3000/api'
+}
+
+const BASE_URL = resolveBaseUrl()
+
+const resolveRequestUrl = (url) => {
+  if (url?.startsWith('http')) return url
+  if (BASE_URL.startsWith('/')) {
+    const origin = typeof window !== 'undefined' && window.location?.origin
+      ? window.location.origin
+      : ''
+    return `${origin}${BASE_URL}${url}`
+  }
+  return `${BASE_URL}${url}`
+}
 
 // 请求超时时间 (毫秒)
 const REQUEST_TIMEOUT = 30000
@@ -25,7 +45,7 @@ const request = (options) => {
     }
 
     uni.request({
-      url: options.url?.startsWith('http') ? options.url : `${BASE_URL}${options.url}`,
+      url: resolveRequestUrl(options.url),
       method: options.method || 'GET',
       data: options.data || {},
       timeout: REQUEST_TIMEOUT,
@@ -98,9 +118,9 @@ const handleAuthError = (message) => {
 
 // 获取允许的域名白名单
 const getAllowedDomains = () => {
-  const domains = ['localhost', '127.0.0.1', 'github.io', 'onrender.com', 'supabase.co']
+  const domains = ['localhost', '127.0.0.1', 'github.io', 'onrender.com', 'supabase.co', 'vercel.app']
   try {
-    const apiUrl = process.env.VUE_APP_API_URL || process.env.API_BASE_URL || ''
+    const apiUrl = resolveBaseUrl()
     if (apiUrl) {
       const hostname = new URL(apiUrl).hostname
       if (hostname && !domains.includes(hostname)) {
@@ -137,7 +157,7 @@ const uploadFile = (options) => {
     }
 
     uni.uploadFile({
-      url: `${BASE_URL}${options.url}`,
+      url: resolveRequestUrl(options.url),
       filePath: options.filePath,
       name: options.name || 'file',
       formData: {

@@ -1,4 +1,4 @@
-const BASE_URL = '/api/admin'
+const BASE_URL = import.meta.env.VITE_API_BASE || '/api/admin'
 
 export async function adminRequest(url, options = {}) {
   const token = localStorage.getItem('adminToken')

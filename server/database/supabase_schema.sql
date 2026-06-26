@@ -192,3 +192,13 @@ using (status = 'visible');
 
 -- Express backend should use SUPABASE_SERVICE_ROLE_KEY for trusted writes.
 -- Keep service role key only on the server side.
+
+-- Supabase Storage: public audio bucket for voice uploads
+insert into storage.buckets (id, name, public)
+values ('audios', 'audios', true)
+on conflict (id) do update set public = excluded.public;
+
+drop policy if exists "Public audio files are readable" on storage.objects;
+create policy "Public audio files are readable"
+on storage.objects for select
+using (bucket_id = 'audios');
